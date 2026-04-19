@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Melofy 🎧</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <h2>🎵 Melofy</h2>
+        <a href="#">Home</a>
+        <a href="#">Search</a>
+        <a href="#">Library</a>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main">
+
+        <h1>Trending Songs</h1>
+
+        <!-- SEARCH -->
+        <form method="GET">
+            <input type="text" name="search" placeholder="Search song">
+            <button>Search</button>
+        </form>
+
+        <!-- 🔐 UPLOAD (ADMIN ONLY - hidden from users) -->
+        {% if is_admin %}
+        <div style="margin: 20px 0;">
+            <form method="POST" enctype="multipart/form-data">
+                <input type="file" name="song" accept=".mp3" required>
+                <input type="file" name="image" accept="image/*" required>
+                <button>Upload</button>
+            </form>
+        </div>
+        {% endif %}
+
+        <!-- SONG GRID -->
+        <div class="songs-container">
+
+            {% for song in songs %}
+            <div class="song-card">
+
+                <img src="{{ url_for('static', filename='images/' ~ song.image) }}">
+
+                <h3>{{ song.name }}</h3>
+
+                <!-- ▶ PLAY -->
+                <button onclick="playSong('{{ url_for('static', filename='songs/' ~ song.file) }}','{{ song.name }}', {{ loop.index0 }})">
+                    ▶ Play
+                </button>
+
+                <!-- ❤️ LIKE -->
+                <button onclick="likeSong('{{ song.name }}')">
+                    ❤️
+                </button>
+
+                <!-- ❌ DELETE (ADMIN ONLY) -->
+                {% if is_admin %}
+                <br>
+                <a href="/delete/{{ song.id }}">Delete</a>
+                {% endif %}
+
+            </div>
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- PLAYER BAR -->
+<div class="player-bar">
+
+    <h3 id="current">No song playing</h3>
+
+    <button onclick="prevSong()">⏮</button>
+    <button onclick="nextSong()">⏭</button>
+
+    <br><br>
+
+    <audio id="player" controls>
+        <source id="audioSource">
+    </audio>
+
+</div>
+
+<!-- 🔥 JAVASCRIPT -->
+<script>
+
+let songs = [
+{% for song in songs %}
+{
+    file: "{{ url_for('static', filename='songs/' ~ song.file) }}",
+    name: "{{ song.name }}"
+},
+{% endfor %}
+];
+
+let currentIndex = 0;
+let player = document.getElementById("player");
+
+function playSong(file, name, index) {
+    document.getElementById("audioSource").src = file;
+    player.load();
+    player.play();
+    currentIndex = index;
+
+    document.getElementById("current").innerText = "Now Playing: " + name;
+}
+
+function nextSong() {
+    currentIndex = (currentIndex + 1) % songs.length;
+    playSong(songs[currentIndex].file, songs[currentIndex].name, currentIndex);
+}
+
+function prevSong() {
+    currentIndex = (currentIndex - 1 + songs.length) % songs.length;
+    playSong(songs[currentIndex].file, songs[currentIndex].name, currentIndex);
+}
+
+player.addEventListener("ended", nextSong);
+
+// ❤️ LIKE (basic UI only)
+function likeSong(name) {
+    alert(name + " added to playlist ❤️");
+}
+
+</script>
+
+</body>
+</html>
