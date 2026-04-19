@@ -2,25 +2,29 @@
 <html>
 <head>
     <title>Melofy</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
     <style>
         body{
             background:#121212;
             color:white;
-            font-family: Arial;
+            font-family: Arial, sans-serif;
+        }
+
+        h1{
+            margin-left:20px;
         }
 
         .songs{
             display:flex;
-            gap:20px;
             flex-wrap:wrap;
+            gap:20px;
+            padding:20px;
         }
 
         .card{
             background:#181818;
             padding:15px;
-            border-radius:10px;
+            border-radius:12px;
             width:180px;
             text-align:center;
             transition:0.3s;
@@ -43,26 +47,26 @@
             color:white;
             border-radius:20px;
             cursor:pointer;
+            margin-top:8px;
         }
 
         button:hover{
             background:#1ed760;
+        }
+
+        #player{
+            margin-left:20px;
+        }
+
+        #controls{
+            margin-left:20px;
         }
     </style>
 </head>
 
 <body>
 
-<h1>Trending Songs</h1>
-
-<!-- Upload hidden feel -->
-<form action="/upload" method="post" enctype="multipart/form-data">
-    <input type="file" name="song" required>
-    <input type="file" name="image" required>
-    <button type="submit">Upload</button>
-</form>
-
-<hr>
+<h1>Melofy</h1>
 
 <div class="songs">
 
@@ -80,17 +84,18 @@
 
 </div>
 
-<br><br>
+<br>
 
-<!-- PLAYER -->
-<h3 id="nowPlaying">No song playing</h3>
+<h3 id="nowPlaying" style="margin-left:20px;">No song playing</h3>
 
 <audio id="player" controls style="width:300px;"></audio>
 
 <br><br>
 
-<button onclick="prevSong()">⏮ Prev</button>
-<button onclick="nextSong()">⏭ Next</button>
+<div id="controls">
+    <button onclick="prevSong()">⏮ Prev</button>
+    <button onclick="nextSong()">⏭ Next</button>
+</div>
 
 <script>
 let songs = [];
