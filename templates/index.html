@@ -12,7 +12,6 @@
             display:flex;
         }
 
-        /* Sidebar */
         .sidebar{
             width:200px;
             background:#000;
@@ -34,17 +33,11 @@
             color:white;
         }
 
-        /* Main */
         .main{
             flex:1;
             padding:20px;
         }
 
-        h1{
-            margin-bottom:20px;
-        }
-
-        /* Search */
         input{
             padding:8px;
             border-radius:5px;
@@ -61,7 +54,6 @@
             cursor:pointer;
         }
 
-        /* Songs */
         .songs{
             display:flex;
             flex-wrap:wrap;
@@ -88,7 +80,6 @@
             border-radius:10px;
         }
 
-        /* Player */
         .player{
             position:fixed;
             bottom:0;
@@ -96,20 +87,12 @@
             right:0;
             background:#181818;
             padding:10px;
-            display:flex;
-            align-items:center;
-            justify-content:space-between;
-        }
-
-        .controls button{
-            margin:0 5px;
         }
     </style>
 </head>
 
 <body>
 
-<!-- Sidebar -->
 <div class="sidebar">
     <h2>Melofy</h2>
     <p>Home</p>
@@ -117,7 +100,6 @@
     <p>Your Library</p>
 </div>
 
-<!-- Main -->
 <div class="main">
 
     <h1>Melofy</h1>
@@ -128,7 +110,6 @@
 
     <!-- Songs -->
     <div class="songs">
-
         {% for song in songs %}
         <div class="card">
 
@@ -140,22 +121,21 @@
 
         </div>
         {% endfor %}
-
     </div>
+
 </div>
 
 <!-- Player -->
 <div class="player">
+    <h3 id="nowPlaying">No song playing</h3>
 
-    <div id="nowPlaying">No song playing</div>
+    <button onclick="prevSong()">⏮</button>
+    <button onclick="togglePlay()">⏯</button>
+    <button onclick="nextSong()">⏭</button>
 
-    <div class="controls">
-        <button onclick="prevSong()">⏮</button>
-        <button onclick="nextSong()">⏭</button>
-    </div>
+    <br><br>
 
-    <audio id="player" controls></audio>
-
+    <audio id="player" controls style="width:300px;"></audio>
 </div>
 
 <script>
@@ -172,28 +152,49 @@ names.push("{{ song['name'] }}");
 let player = document.getElementById("player");
 let nowPlaying = document.getElementById("nowPlaying");
 
+// Play
 function playSong(index){
     currentIndex = index;
-    player.src = songs[index];
+
+    if(player.src !== songs[index]){
+        player.src = songs[index];
+    }
+
     player.play();
     nowPlaying.innerText = "Now Playing: " + names[index];
 }
 
+// Toggle
+function togglePlay(){
+    if(player.paused){
+        player.play();
+    } else {
+        player.pause();
+    }
+}
+
+// Next
 function nextSong(){
     currentIndex = (currentIndex + 1) % songs.length;
-    playSong(currentIndex);
+    player.src = songs[currentIndex];
+    player.play();
+    nowPlaying.innerText = "Now Playing: " + names[currentIndex];
 }
 
+// Prev
 function prevSong(){
     currentIndex = (currentIndex - 1 + songs.length) % songs.length;
-    playSong(currentIndex);
+    player.src = songs[currentIndex];
+    player.play();
+    nowPlaying.innerText = "Now Playing: " + names[currentIndex];
 }
 
+// Auto next
 player.onended = function(){
     nextSong();
 }
 
-/* Search */
+// Search
 function searchSongs(){
     let input = document.getElementById("searchInput").value.toLowerCase();
     let cards = document.getElementsByClassName("card");
