@@ -9,7 +9,7 @@
 
 <h1>Trending Songs</h1>
 
-<!-- Upload (only you use) -->
+<!-- Upload (admin only use) -->
 <form action="/upload" method="post" enctype="multipart/form-data">
     <input type="file" name="song" required>
     <input type="file" name="image" required>
@@ -21,26 +21,65 @@
 <div class="songs">
 
     {% for song in songs %}
-    <div class="card" onclick="playSong('{{ url_for('static', filename='songs/' + song['file']) }}')">
+    <div class="card">
 
         <img src="{{ url_for('static', filename='images/' + song['image']) }}" width="150">
 
         <h3>{{ song['name'] }}</h3>
+
+        <button onclick="playSong({{ loop.index0 }})">▶ Play</button>
 
     </div>
     {% endfor %}
 
 </div>
 
-<br>
+<br><br>
+
+<!-- Player -->
+<h3 id="nowPlaying">No song playing</h3>
 
 <audio id="player" controls style="width: 300px;"></audio>
 
+<br><br>
+
+<button onclick="prevSong()">⏮ Prev</button>
+<button onclick="nextSong()">⏭ Next</button>
+
+<!-- JS -->
 <script>
-function playSong(src){
-    let player = document.getElementById("player");
-    player.src = src;
+let songs = [];
+let names = [];
+let currentIndex = 0;
+
+{% for song in songs %}
+songs.push("{{ url_for('static', filename='songs/' + song['file']) }}");
+names.push("{{ song['name'] }}");
+{% endfor %}
+
+let player = document.getElementById("player");
+let nowPlaying = document.getElementById("nowPlaying");
+
+function playSong(index){
+    currentIndex = index;
+    player.src = songs[index];
     player.play();
+    nowPlaying.innerText = "Now Playing: " + names[index];
+}
+
+function nextSong(){
+    currentIndex = (currentIndex + 1) % songs.length;
+    playSong(currentIndex);
+}
+
+function prevSong(){
+    currentIndex = (currentIndex - 1 + songs.length) % songs.length;
+    playSong(currentIndex);
+}
+
+// Auto next
+player.onended = function(){
+    nextSong();
 }
 </script>
 
