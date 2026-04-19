@@ -1,67 +1,48 @@
-body {
-    margin: 0;
+body{
+    background:#121212;
+    color:white;
     font-family: Arial, sans-serif;
-    background: #121212;
-    color: white;
 }
 
-h1 {
-    padding: 20px;
+/* Songs container */
+.songs{
+    display:flex;
+    flex-wrap:wrap;
+    gap:20px;
+    padding:20px;
 }
 
-.songs {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    padding: 20px;
+/* Card */
+.card{
+    background:#181818;
+    padding:15px;
+    border-radius:12px;
+    width:180px;
+    text-align:center;
+    transition:0.3s;
 }
 
-.card {
-    background: #181818;
-    padding: 15px;
-    border-radius: 10px;
-    width: 180px;
-    cursor: pointer;
-    transition: 0.3s;
-    position: relative;
+.card:hover{
+    background:#282828;
+    transform:scale(1.05);
 }
 
-.card:hover {
-    background: #282828;
-    transform: scale(1.05);
+/* Image */
+.card img{
+    width:100%;
+    border-radius:10px;
 }
 
-.card img {
-    width: 100%;
-    border-radius: 10px;
+/* Button */
+button{
+    background:#1db954;
+    border:none;
+    padding:8px 12px;
+    color:white;
+    border-radius:20px;
+    cursor:pointer;
 }
 
-.card h3 {
-    margin-top: 10px;
-    font-size: 16px;
-}
-
-/* Play Button */
-.play-btn {
-    position: absolute;
-    bottom: 70px;
-    right: 15px;
-    background: #1db954;
-    border-radius: 50%;
-    padding: 10px;
-    opacity: 0;
-    transition: 0.3s;
-}
-
-.card:hover .play-btn {
-    opacity: 1;
-    transform: translateY(-5px);
-}
-
-/* Player */
-audio {
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    background: #181818;
+button:hover{
+    background:#1ed760;
 }
