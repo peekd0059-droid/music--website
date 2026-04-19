@@ -5,26 +5,74 @@
 
     <style>
         body{
+            margin:0;
             background:#121212;
             color:white;
-            font-family: Arial, sans-serif;
+            font-family: Arial;
+            display:flex;
+        }
+
+        /* Sidebar */
+        .sidebar{
+            width:200px;
+            background:#000;
+            height:100vh;
+            padding:20px;
+        }
+
+        .sidebar h2{
+            color:#1db954;
+        }
+
+        .sidebar p{
+            margin:15px 0;
+            cursor:pointer;
+            color:#b3b3b3;
+        }
+
+        .sidebar p:hover{
+            color:white;
+        }
+
+        /* Main */
+        .main{
+            flex:1;
+            padding:20px;
         }
 
         h1{
-            margin-left:20px;
+            margin-bottom:20px;
         }
 
+        /* Search */
+        input{
+            padding:8px;
+            border-radius:5px;
+            border:none;
+            width:200px;
+        }
+
+        button{
+            background:#1db954;
+            border:none;
+            padding:8px 12px;
+            color:white;
+            border-radius:20px;
+            cursor:pointer;
+        }
+
+        /* Songs */
         .songs{
             display:flex;
             flex-wrap:wrap;
             gap:20px;
-            padding:20px;
+            margin-top:20px;
         }
 
         .card{
             background:#181818;
             padding:15px;
-            border-radius:12px;
+            border-radius:10px;
             width:180px;
             text-align:center;
             transition:0.3s;
@@ -40,64 +88,78 @@
             border-radius:10px;
         }
 
-        button{
-            background:#1db954;
-            border:none;
-            padding:8px 12px;
-            color:white;
-            border-radius:20px;
-            cursor:pointer;
-            margin-top:8px;
+        /* Player */
+        .player{
+            position:fixed;
+            bottom:0;
+            left:200px;
+            right:0;
+            background:#181818;
+            padding:10px;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
         }
 
-        button:hover{
-            background:#1ed760;
-        }
-
-        #player{
-            margin-left:20px;
-        }
-
-        #controls{
-            margin-left:20px;
+        .controls button{
+            margin:0 5px;
         }
     </style>
 </head>
 
 <body>
 
-<h1>Melofy</h1>
-
-<div class="songs">
-
-    {% for song in songs %}
-    <div class="card">
-
-        <img src="{{ url_for('static', filename='images/' + song['image']) }}">
-
-        <h3>{{ song['name'] }}</h3>
-
-        <button onclick="playSong({{ loop.index0 }})">▶ Play</button>
-
-    </div>
-    {% endfor %}
-
+<!-- Sidebar -->
+<div class="sidebar">
+    <h2>Melofy</h2>
+    <p>Home</p>
+    <p>Search</p>
+    <p>Your Library</p>
 </div>
 
-<br>
+<!-- Main -->
+<div class="main">
 
-<h3 id="nowPlaying" style="margin-left:20px;">No song playing</h3>
+    <h1>Melofy</h1>
 
-<audio id="player" controls style="width:300px;"></audio>
+    <!-- Search -->
+    <input type="text" id="searchInput" placeholder="Search song..." onkeyup="searchSongs()">
+    <button onclick="searchSongs()">Search</button>
 
-<br><br>
+    <!-- Songs -->
+    <div class="songs">
 
-<div id="controls">
-    <button onclick="prevSong()">⏮ Prev</button>
-    <button onclick="nextSong()">⏭ Next</button>
+        {% for song in songs %}
+        <div class="card">
+
+            <img src="{{ url_for('static', filename='images/' + song['image']) }}">
+
+            <h3>{{ song['name'] }}</h3>
+
+            <button onclick="playSong({{ loop.index0 }})">▶ Play</button>
+
+        </div>
+        {% endfor %}
+
+    </div>
+</div>
+
+<!-- Player -->
+<div class="player">
+
+    <div id="nowPlaying">No song playing</div>
+
+    <div class="controls">
+        <button onclick="prevSong()">⏮</button>
+        <button onclick="nextSong()">⏭</button>
+    </div>
+
+    <audio id="player" controls></audio>
+
 </div>
 
 <script>
+
 let songs = [];
 let names = [];
 let currentIndex = 0;
@@ -130,6 +192,23 @@ function prevSong(){
 player.onended = function(){
     nextSong();
 }
+
+/* Search */
+function searchSongs(){
+    let input = document.getElementById("searchInput").value.toLowerCase();
+    let cards = document.getElementsByClassName("card");
+
+    for(let i=0;i<cards.length;i++){
+        let text = cards[i].innerText.toLowerCase();
+
+        if(text.includes(input)){
+            cards[i].style.display="block";
+        }else{
+            cards[i].style.display="none";
+        }
+    }
+}
+
 </script>
 
 </body>
