@@ -1,146 +1,51 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Melofy</title>
-    <link rel="stylesheet" href="/static/css/style.css">
+<title>Melofy</title>
+<link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
 
 <h1>🎧 Melofy</h1>
 
-<div class="nav">
-    <a href="/liked">❤️ Liked Songs</a>
-    <a href="/logout">Logout</a>
-</div>
+<input type="text" id="search" placeholder="Search song..." onkeyup="searchSong()">
 
-<div class="songs">
+<a href="/playlists">📂 Playlists</a>
+<a href="/logout">Logout</a>
+
+<div class="songs" id="songs">
 {% for song in songs %}
-    <div class="card" id="card-{{ loop.index0 }}">
+<div class="card">
+    <h3>{{ song.name }}</h3>
 
-        <img src="/static/{{ song.img }}">
+    <button onclick="playSong('{{ song.file }}')">▶</button>
 
-        <h3>{{ song.name }}</h3>
-
-        <button onclick="playSong({{ loop.index0 }})">▶ Play</button>
-
-        <button class="like-btn {% if song.name in liked %}liked{% endif %}"
-                onclick="toggleLike(this, '{{ song.name }}')">
-            ❤
-        </button>
-
-    </div>
+    <form action="/add_to_playlist" method="POST">
+        <input type="hidden" name="song" value="{{ song.name }}">
+        <input type="number" name="pid" placeholder="Playlist ID">
+        <button>Add</button>
+    </form>
+</div>
 {% endfor %}
 </div>
 
-<!-- 🔥 PLAYER -->
-<div class="player">
-    <div class="player-left">
-        <span id="nowPlaying">No song</span>
-    </div>
-
-    <div class="player-center">
-        <button onclick="prevSong()">⏮</button>
-        <button onclick="togglePlay()">▶ / ⏸</button>
-        <button onclick="nextSong()">⏭</button>
-
-        <br>
-
-        <span id="currentTime">0:00</span>
-        <input type="range" id="progress" value="0" step="1">
-        <span id="duration">0:00</span>
-    </div>
-
-    <div class="player-right">
-        🔊 <input type="range" id="volume" min="0" max="1" step="0.01">
-    </div>
-
-    <audio id="audio"></audio>
-</div>
+<audio id="player" controls></audio>
 
 <script>
-let songs = [
-{% for song in songs %}
-    {file: "/static/{{ song.file }}", name: "{{ song.name }}"},
-{% endfor %}
-];
-
-let current = 0;
-let audio = document.getElementById("audio");
-
-function playSong(index){
-    current = index;
-    audio.src = songs[index].file;
-    audio.play();
-    updateUI();
+function playSong(file){
+    let player = document.getElementById("player");
+    player.src = "/static/" + file;
+    player.play();
 }
 
-function togglePlay(){
-    if(audio.paused) audio.play();
-    else audio.pause();
-}
+function searchSong(){
+    let input = document.getElementById("search").value.toLowerCase();
+    let cards = document.querySelectorAll(".card");
 
-function nextSong(){
-    current = (current + 1) % songs.length;
-    playSong(current);
-}
-
-function prevSong(){
-    current = (current - 1 + songs.length) % songs.length;
-    playSong(current);
-}
-
-function updateUI(){
-    document.getElementById("nowPlaying").innerText = songs[current].name;
-
-    document.querySelectorAll(".card").forEach(c => c.classList.remove("active"));
-    document.getElementById("card-"+current).classList.add("active");
-}
-
-// ===== progress =====
-audio.ontimeupdate = () => {
-    document.getElementById("progress").value = audio.currentTime;
-    document.getElementById("currentTime").innerText = formatTime(audio.currentTime);
-};
-
-audio.onloadedmetadata = () => {
-    document.getElementById("progress").max = audio.duration;
-    document.getElementById("duration").innerText = formatTime(audio.duration);
-};
-
-document.getElementById("progress").oninput = (e)=>{
-    audio.currentTime = e.target.value;
-};
-
-// ===== volume =====
-document.getElementById("volume").oninput = (e)=>{
-    audio.volume = e.target.value;
-};
-
-// ===== auto next =====
-audio.onended = nextSong;
-
-// ===== like =====
-function toggleLike(btn, song){
-    fetch("/toggle_like", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({song: song})
-    })
-    .then(res => res.json())
-    .then(data => {
-        if(data.liked){
-            btn.classList.add("liked");
-        } else {
-            btn.classList.remove("liked");
-        }
+    cards.forEach(c=>{
+        let text = c.innerText.toLowerCase();
+        c.style.display = text.includes(input) ? "block" : "none";
     });
-}
-
-// ===== helper =====
-function formatTime(sec){
-    let m = Math.floor(sec/60);
-    let s = Math.floor(sec%60);
-    return m + ":" + (s<10?"0":"") + s;
 }
 </script>
 

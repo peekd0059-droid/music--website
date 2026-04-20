@@ -1,11 +1,24 @@
 <!DOCTYPE html>
 <html>
-<body style="background:black;color:white;">
-<h1>{{ playlist[0] }}</h1>
+<head>
+<title>Playlists</title>
+</head>
+<body>
 
-{% for song in songs %}
-<p>{{ song[0] }}</p>
+<h1>Your Playlists</h1>
+
+<form action="/create_playlist" method="POST">
+    <input type="text" name="name" placeholder="Playlist name">
+    <button>Create</button>
+</form>
+
+<ul>
+{% for p in playlists %}
+    <li>{{ p[2] }} (ID: {{ p[0] }})</li>
 {% endfor %}
+</ul>
+
+<a href="/">⬅ Back</a>
 
 </body>
 </html>
