@@ -21,9 +21,9 @@
 
         <h3>{{ song.name }}</h3>
 
-        <audio controls>
-            <source src="/static/{{ song.file }}">
-        </audio>
+        <button onclick="playSong('{{ song.file }}', '{{ song.name }}')">
+            ▶ Play
+        </button>
 
         <a href="/like/{{ song.name }}">❤️ Like</a>
 
@@ -31,6 +31,67 @@
 {% endfor %}
 </div>
 
+<!-- 🔥 BOTTOM PLAYER -->
+<div class="player">
+    <h3 id="nowPlaying">No song playing</h3>
+
+    <audio id="audioPlayer"></audio>
+
+    <div class="controls">
+        <button onclick="prevSong()">⏮</button>
+        <button onclick="togglePlay()">▶ / ⏸</button>
+        <button onclick="nextSong()">⏭</button>
+    </div>
+</div>
+
+<script>
+
+let songs = [
+{% for song in songs %}
+    "/static/{{ song.file }}",
+{% endfor %}
+];
+
+let names = [
+{% for song in songs %}
+    "{{ song.name }}",
+{% endfor %}
+];
+
+let current = 0;
+let player = document.getElementById("audioPlayer");
+
+function playSong(file, name){
+    player.src = "/static/" + file;
+    player.play();
+    document.getElementById("nowPlaying").innerText = name;
+
+    current = songs.indexOf("/static/" + file);
+}
+
+function togglePlay(){
+    if(player.paused){
+        player.play();
+    } else {
+        player.pause();
+    }
+}
+
+function nextSong(){
+    current = (current + 1) % songs.length;
+    player.src = songs[current];
+    player.play();
+    document.getElementById("nowPlaying").innerText = names[current];
+}
+
+function prevSong(){
+    current = (current - 1 + songs.length) % songs.length;
+    player.src = songs[current];
+    player.play();
+    document.getElementById("nowPlaying").innerText = names[current];
+}
+
+</script>
+
 </body>
-</html>
 </html>
