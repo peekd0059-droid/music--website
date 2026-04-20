@@ -1,46 +1,123 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+<meta charset="UTF-8">
 <title>Melofy</title>
+
+<style>
+body{background:#0a0a0f;color:white;font-family:sans-serif}
+.header{display:flex;justify-content:space-between;align-items:center;padding:20px}
+.search input{padding:8px;border-radius:5px;border:none}
+.songs{display:flex;gap:20px;padding:20px}
+.card{background:#111;padding:15px;border-radius:10px;width:200px}
+.card img{width:100%;height:150px;object-fit:cover}
+.player{position:fixed;bottom:0;width:100%;background:#111;padding:10px}
+.btn{color:#1db954;text-decoration:none}
+</style>
 </head>
 
 <body>
 
+<!-- HEADER -->
+<div class="header">
 <h2>🎧 Melofy</h2>
 
-<!-- 🔍 SEARCH -->
+<div class="search">
 <form action="/search">
 <input type="text" name="q" placeholder="Search songs">
-<button>Search</button>
 </form>
+</div>
 
-<!-- ❤️ LIKED -->
-<a href="/liked">❤️ Liked Songs</a>
+<div>
+<a href="/liked" class="btn">❤️ Liked</a>
+</div>
+</div>
 
-<!-- 📂 PLAYLIST -->
+<!-- PLAYLIST -->
+<div style="padding:20px">
 <form action="/create_playlist" method="POST">
-<input name="name" placeholder="Playlist name">
-<button>Create Playlist</button>
+<input name="name" placeholder="Create playlist">
+<button>Create</button>
 </form>
+</div>
 
-<hr>
+<!-- SONGS -->
+<div class="songs">
 
 {% for song in songs %}
-<div>
+<div class="card">
 
-<h3>{{song[1]}}</h3>
+{% if song[3] %}
+<img src="{{ url_for('static', filename=song[3]) }}">
+{% endif %}
 
-<audio controls>
-<source src="/static/{{song[2]}}">
-</audio>
+<h4>{{song[1]}}</h4>
 
-<br>
+<button onclick="playSong('{{song[2]}}','{{song[1]}}')">▶ Play</button>
 
-<a href="/like/{{song[0]}}">❤️ Like</a>
+<br><br>
+
+<a href="/like/{{song[0]}}" class="btn">❤️ Like</a>
 
 </div>
-<hr>
 {% endfor %}
+
+</div>
+
+<!-- PLAYER -->
+<div class="player">
+<p id="title">Select song</p>
+
+<button onclick="prevSong()">⏮</button>
+<button onclick="togglePlay()">⏯</button>
+<button onclick="nextSong()">⏭</button>
+
+<audio id="audio" style="width:100%"></audio>
+</div>
+
+<script>
+
+let audio = document.getElementById("audio");
+let isPlaying = false;
+let songs = [];
+let currentIndex = 0;
+
+// collect songs
+document.querySelectorAll(".card").forEach((card, i)=>{
+    let file = card.querySelector("button").getAttribute("onclick").split("'")[1];
+    let title = card.querySelector("h4").innerText;
+    songs.push({file,title});
+});
+
+function playSong(file,title){
+    audio.src="/static/"+file;
+    audio.play();
+    isPlaying=true;
+    document.getElementById("title").innerText=title;
+    currentIndex = songs.findIndex(s=>s.file===file);
+}
+
+function togglePlay(){
+    if(!audio.src) return;
+    if(isPlaying){audio.pause();isPlaying=false;}
+    else{audio.play();isPlaying=true;}
+}
+
+function nextSong(){
+    currentIndex=(currentIndex+1)%songs.length;
+    let s=songs[currentIndex];
+    playSong(s.file,s.title);
+}
+
+function prevSong(){
+    currentIndex=(currentIndex-1+songs.length)%songs.length;
+    let s=songs[currentIndex];
+    playSong(s.file,s.title);
+}
+
+audio.addEventListener("ended",nextSong);
+
+</script>
 
 </body>
 </html>
