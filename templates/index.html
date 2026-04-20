@@ -12,18 +12,19 @@
 
     <input type="text" id="search" placeholder="Search songs..." onkeyup="searchSong()">
 
-    <div>
+    <div class="nav-links">
         <a href="/playlists">📂 Playlists</a>
         <a href="/logout">Logout</a>
     </div>
 </div>
 
-<!-- SONGS -->
+<!-- SONG GRID -->
 <div class="songs" id="songs">
 {% for song in songs %}
 <div class="card">
 
-    <img src="/static/{{ song.img }}">
+    <!-- ✅ FIXED IMAGE PATH -->
+    <img src="{{ url_for('static', filename=song.img) }}">
 
     <h3>{{ song.name }}</h3>
 
@@ -33,7 +34,7 @@
 {% endfor %}
 </div>
 
-<!-- PLAYER -->
+<!-- 🎧 CENTER PLAYER -->
 <div class="player">
     <audio id="player" controls></audio>
 </div>
@@ -57,5 +58,4 @@ function searchSong(){
 </script>
 
 </body>
-</html>
 </html>
