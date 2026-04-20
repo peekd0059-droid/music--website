@@ -5,9 +5,25 @@ app = Flask(__name__)
 app.secret_key = "secret123"
 
 
-# ===== DATABASE =====
-def get_db():
-    return sqlite3.connect("songs.db")
+# ===== DATABASE INIT =====
+def init_db():
+    conn = sqlite3.connect("songs.db")
+    c = conn.cursor()
+
+    # users table
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT,
+        password TEXT
+    )
+    """)
+
+    conn.commit()
+    conn.close()
+
+
+init_db()
 
 
 # ===== HOME =====
@@ -15,7 +31,7 @@ def get_db():
 def home():
     if "user" not in session:
         return redirect("/login")
-    return "Home working"
+    return "<h1>Home Working ✅</h1>"
 
 
 # ===== LOGIN =====
@@ -26,7 +42,7 @@ def login():
             username = request.form.get("username")
             password = request.form.get("password")
 
-            conn = get_db()
+            conn = sqlite3.connect("songs.db")
             c = conn.cursor()
 
             c.execute("SELECT * FROM users WHERE username=? AND password=?", (username, password))
@@ -55,10 +71,11 @@ def signup():
             username = request.form.get("username")
             password = request.form.get("password")
 
-            conn = get_db()
+            conn = sqlite3.connect("songs.db")
             c = conn.cursor()
 
             c.execute("INSERT INTO users (username, password) VALUES (?, ?)", (username, password))
+
             conn.commit()
             conn.close()
 
