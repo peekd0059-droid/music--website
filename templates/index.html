@@ -15,82 +15,133 @@
 
 <div class="songs">
 {% for song in songs %}
-    <div class="card">
+    <div class="card" id="card-{{ loop.index0 }}">
 
         <img src="/static/{{ song.img }}">
 
         <h3>{{ song.name }}</h3>
 
-        <button onclick="playSong('{{ song.file }}', '{{ song.name }}')">
-            ▶ Play
-        </button>
+        <button onclick="playSong({{ loop.index0 }})">▶ Play</button>
 
-        <a href="/like/{{ song.name }}">❤️ Like</a>
+        <button class="like-btn {% if song.name in liked %}liked{% endif %}"
+                onclick="toggleLike(this, '{{ song.name }}')">
+            ❤
+        </button>
 
     </div>
 {% endfor %}
 </div>
 
-<!-- 🔥 BOTTOM PLAYER -->
+<!-- 🔥 PLAYER -->
 <div class="player">
-    <h3 id="nowPlaying">No song playing</h3>
+    <div class="player-left">
+        <span id="nowPlaying">No song</span>
+    </div>
 
-    <audio id="audioPlayer"></audio>
-
-    <div class="controls">
+    <div class="player-center">
         <button onclick="prevSong()">⏮</button>
         <button onclick="togglePlay()">▶ / ⏸</button>
         <button onclick="nextSong()">⏭</button>
+
+        <br>
+
+        <span id="currentTime">0:00</span>
+        <input type="range" id="progress" value="0" step="1">
+        <span id="duration">0:00</span>
     </div>
+
+    <div class="player-right">
+        🔊 <input type="range" id="volume" min="0" max="1" step="0.01">
+    </div>
+
+    <audio id="audio"></audio>
 </div>
 
 <script>
-
 let songs = [
 {% for song in songs %}
-    "/static/{{ song.file }}",
-{% endfor %}
-];
-
-let names = [
-{% for song in songs %}
-    "{{ song.name }}",
+    {file: "/static/{{ song.file }}", name: "{{ song.name }}"},
 {% endfor %}
 ];
 
 let current = 0;
-let player = document.getElementById("audioPlayer");
+let audio = document.getElementById("audio");
 
-function playSong(file, name){
-    player.src = "/static/" + file;
-    player.play();
-    document.getElementById("nowPlaying").innerText = name;
-
-    current = songs.indexOf("/static/" + file);
+function playSong(index){
+    current = index;
+    audio.src = songs[index].file;
+    audio.play();
+    updateUI();
 }
 
 function togglePlay(){
-    if(player.paused){
-        player.play();
-    } else {
-        player.pause();
-    }
+    if(audio.paused) audio.play();
+    else audio.pause();
 }
 
 function nextSong(){
     current = (current + 1) % songs.length;
-    player.src = songs[current];
-    player.play();
-    document.getElementById("nowPlaying").innerText = names[current];
+    playSong(current);
 }
 
 function prevSong(){
     current = (current - 1 + songs.length) % songs.length;
-    player.src = songs[current];
-    player.play();
-    document.getElementById("nowPlaying").innerText = names[current];
+    playSong(current);
 }
 
+function updateUI(){
+    document.getElementById("nowPlaying").innerText = songs[current].name;
+
+    document.querySelectorAll(".card").forEach(c => c.classList.remove("active"));
+    document.getElementById("card-"+current).classList.add("active");
+}
+
+// ===== progress =====
+audio.ontimeupdate = () => {
+    document.getElementById("progress").value = audio.currentTime;
+    document.getElementById("currentTime").innerText = formatTime(audio.currentTime);
+};
+
+audio.onloadedmetadata = () => {
+    document.getElementById("progress").max = audio.duration;
+    document.getElementById("duration").innerText = formatTime(audio.duration);
+};
+
+document.getElementById("progress").oninput = (e)=>{
+    audio.currentTime = e.target.value;
+};
+
+// ===== volume =====
+document.getElementById("volume").oninput = (e)=>{
+    audio.volume = e.target.value;
+};
+
+// ===== auto next =====
+audio.onended = nextSong;
+
+// ===== like =====
+function toggleLike(btn, song){
+    fetch("/toggle_like", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({song: song})
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.liked){
+            btn.classList.add("liked");
+        } else {
+            btn.classList.remove("liked");
+        }
+    });
+}
+
+// ===== helper =====
+function formatTime(sec){
+    let m = Math.floor(sec/60);
+    let s = Math.floor(sec%60);
+    return m + ":" + (s<10?"0":"") + s;
+}
 </script>
 
 </body>

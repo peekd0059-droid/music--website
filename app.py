@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session
+from flask import Flask, render_template, request, redirect, session, jsonify
 import sqlite3
 
 app = Flask(__name__)
@@ -50,27 +50,46 @@ def home():
         {"name": "MXZI Deno Favela", "file": "songs/MXZI, Deno - FAVELA.mp3", "img": "images/MXZI, Deno - FAVELA.jpg"},
     ]
 
-    return render_template("index.html", songs=songs)
+    # liked songs of current user
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("SELECT song FROM liked WHERE username=?", (session["user"],))
+    liked = [row[0] for row in c.fetchall()]
+    conn.close()
+
+    return render_template("index.html", songs=songs, liked=liked)
 
 
-# ===== LIKE =====
-@app.route("/like/<song>")
-def like(song):
+# ===== TOGGLE LIKE (AJAX) =====
+@app.route("/toggle_like", methods=["POST"])
+def toggle_like():
     if "user" not in session:
-        return redirect("/login")
+        return jsonify({"status": "login_required"}), 401
+
+    data = request.get_json()
+    song = data.get("song")
 
     conn = get_db()
     c = conn.cursor()
 
-    c.execute("INSERT INTO liked (username, song) VALUES (?, ?)", (session["user"], song))
+    # check exists
+    c.execute("SELECT id FROM liked WHERE username=? AND song=?", (session["user"], song))
+    row = c.fetchone()
+
+    if row:
+        c.execute("DELETE FROM liked WHERE id=?", (row[0],))
+        liked = False
+    else:
+        c.execute("INSERT INTO liked (username, song) VALUES (?, ?)", (session["user"], song))
+        liked = True
 
     conn.commit()
     conn.close()
 
-    return redirect("/")
+    return jsonify({"liked": liked})
 
 
-# ===== LIKED =====
+# ===== LIKED PAGE =====
 @app.route("/liked")
 def liked():
     if "user" not in session:
@@ -80,7 +99,7 @@ def liked():
     c = conn.cursor()
 
     c.execute("SELECT song FROM liked WHERE username=?", (session["user"],))
-    songs = c.fetchall()
+    songs = [row[0] for row in c.fetchall()]
 
     conn.close()
 
