@@ -1,35 +1,42 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Melofy</title>
-<link rel="stylesheet" href="/static/css/style.css">
+    <title>Melofy</title>
+    <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
 
-<h1>🎧 Melofy</h1>
+<!-- NAVBAR -->
+<div class="navbar">
+    <h2>🎧 Melofy</h2>
 
-<input type="text" id="search" placeholder="Search song..." onkeyup="searchSong()">
+    <input type="text" id="search" placeholder="Search songs..." onkeyup="searchSong()">
 
-<a href="/playlists">📂 Playlists</a>
-<a href="/logout">Logout</a>
+    <div>
+        <a href="/playlists">📂 Playlists</a>
+        <a href="/logout">Logout</a>
+    </div>
+</div>
 
+<!-- SONGS -->
 <div class="songs" id="songs">
 {% for song in songs %}
 <div class="card">
+
+    <img src="/static/{{ song.img }}">
+
     <h3>{{ song.name }}</h3>
 
-    <button onclick="playSong('{{ song.file }}')">▶</button>
+    <button onclick="playSong('{{ song.file }}')">▶ Play</button>
 
-    <form action="/add_to_playlist" method="POST">
-        <input type="hidden" name="song" value="{{ song.name }}">
-        <input type="number" name="pid" placeholder="Playlist ID">
-        <button>Add</button>
-    </form>
 </div>
 {% endfor %}
 </div>
 
-<audio id="player" controls></audio>
+<!-- PLAYER -->
+<div class="player">
+    <audio id="player" controls></audio>
+</div>
 
 <script>
 function playSong(file){
@@ -50,4 +57,5 @@ function searchSong(){
 </script>
 
 </body>
+</html>
 </html>

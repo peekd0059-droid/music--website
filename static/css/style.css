@@ -1,23 +1,36 @@
 body {
+    margin: 0;
+    font-family: Arial;
     background: #121212;
     color: white;
-    font-family: Arial;
-    margin: 0;
 }
 
-/* NAV */
-.nav {
-    padding: 10px 20px;
+/* NAVBAR */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 30px;
+    background: #181818;
 }
 
-.nav a {
-    margin-right: 15px;
+.navbar input {
+    padding: 8px;
+    border-radius: 20px;
+    border: none;
+    width: 250px;
+}
+
+.navbar a {
     color: #1db954;
+    margin-left: 15px;
+    text-decoration: none;
 }
 
 /* SONG GRID */
 .songs {
     display: flex;
+    flex-wrap: wrap;
     gap: 20px;
     padding: 20px;
 }
@@ -27,13 +40,14 @@ body {
     background: #181818;
     padding: 15px;
     border-radius: 10px;
-    width: 220px;
+    width: 200px;
     text-align: center;
     transition: 0.3s;
 }
 
-.card.active {
-    border: 2px solid #1db954;
+.card:hover {
+    background: #282828;
+    transform: scale(1.05);
 }
 
 .card img {
@@ -42,20 +56,12 @@ body {
 }
 
 .card button {
-    margin-top: 8px;
-    padding: 6px 10px;
-    border-radius: 20px;
+    margin-top: 10px;
+    padding: 8px 15px;
     border: none;
+    border-radius: 20px;
+    background: #1db954;
     cursor: pointer;
-}
-
-.like-btn {
-    background: #333;
-    color: white;
-}
-
-.like-btn.liked {
-    color: red;
 }
 
 /* PLAYER */
@@ -65,11 +71,4 @@ body {
     width: 100%;
     background: #181818;
     padding: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.player-center input {
-    width: 200px;
 }
