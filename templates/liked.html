@@ -9,22 +9,22 @@
 
 <h1>❤️ Liked Songs</h1>
 
-<a href="/">⬅ Back</a>
-
 <div class="songs">
 
-{% for song in songs %}
-<div class="card">
+{% if songs %}
+    {% for song in songs %}
+    <div class="card">
+        <img src="{{ song.image }}" width="150">
+        <h3>{{ song.name }}</h3>
 
-    <img src="{{ song.image }}" width="150">
-    <h3>{{ song.name }}</h3>
-
-    <audio controls>
-        <source src="{{ song.file }}">
-    </audio>
-
-</div>
-{% endfor %}
+        <audio controls>
+            <source src="{{ song.file }}">
+        </audio>
+    </div>
+    {% endfor %}
+{% else %}
+    <p>No liked songs yet</p>
+{% endif %}
 
 </div>
 
