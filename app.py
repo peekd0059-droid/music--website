@@ -1,16 +1,26 @@
 from flask import Flask, render_template, request, redirect, session
 import sqlite3
+import os
 
 app = Flask(__name__)
 app.secret_key = "secret123"
 
 
-# ===== DATABASE INIT =====
+# ===== DATABASE PATH FIX =====
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.path.join(BASE_DIR, "songs.db")
+
+
+# ===== DB CONNECT =====
+def get_db():
+    return sqlite3.connect(DB_PATH)
+
+
+# ===== INIT DB =====
 def init_db():
-    conn = sqlite3.connect("songs.db")
+    conn = get_db()
     c = conn.cursor()
 
-    # users table
     c.execute("""
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -31,21 +41,24 @@ init_db()
 def home():
     if "user" not in session:
         return redirect("/login")
-    return "<h1>Home Working ✅</h1>"
+    return "<h1>✅ Login Successful - Home Page</h1>"
 
 
 # ===== LOGIN =====
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    try:
-        if request.method == "POST":
+    if request.method == "POST":
+        try:
             username = request.form.get("username")
             password = request.form.get("password")
 
-            conn = sqlite3.connect("songs.db")
+            conn = get_db()
             c = conn.cursor()
 
-            c.execute("SELECT * FROM users WHERE username=? AND password=?", (username, password))
+            c.execute(
+                "SELECT * FROM users WHERE username=? AND password=?",
+                (username, password)
+            )
             user = c.fetchone()
 
             conn.close()
@@ -54,38 +67,41 @@ def login():
                 session["user"] = username
                 return redirect("/")
             else:
-                return "Invalid Login"
+                return "❌ Wrong username or password"
 
-        return render_template("login.html")
+        except Exception as e:
+            print("LOGIN ERROR:", e)
+            return f"Error: {str(e)}"
 
-    except Exception as e:
-        print("LOGIN ERROR:", e)
-        return "Login Error"
+    return render_template("login.html")
 
 
 # ===== SIGNUP =====
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
-    try:
-        if request.method == "POST":
+    if request.method == "POST":
+        try:
             username = request.form.get("username")
             password = request.form.get("password")
 
-            conn = sqlite3.connect("songs.db")
+            conn = get_db()
             c = conn.cursor()
 
-            c.execute("INSERT INTO users (username, password) VALUES (?, ?)", (username, password))
+            c.execute(
+                "INSERT INTO users (username, password) VALUES (?, ?)",
+                (username, password)
+            )
 
             conn.commit()
             conn.close()
 
             return redirect("/login")
 
-        return render_template("signup.html")
+        except Exception as e:
+            print("SIGNUP ERROR:", e)
+            return f"Error: {str(e)}"
 
-    except Exception as e:
-        print("SIGNUP ERROR:", e)
-        return "Signup Error"
+    return render_template("signup.html")
 
 
 # ===== LOGOUT =====
