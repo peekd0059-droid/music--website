@@ -1,20 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Melofy</title>
+<meta charset="UTF-8">
+<title>Melofy</title>
 
-  <!-- SAME UI CSS (unchanged) -->
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-
-  <style>
-    body{background:#0a0a0f;color:white;font-family:'DM Sans'}
-    .songs-grid{display:flex;gap:20px;flex-wrap:wrap}
-    .song-card{background:#111;padding:15px;border-radius:10px;width:180px;cursor:pointer}
-    .song-art img{width:100%;height:150px;object-fit:cover}
-    .song-name{font-size:14px;margin-top:10px}
-  </style>
+<style>
+body{background:#0a0a0f;color:white;font-family:sans-serif}
+.songs-grid{display:flex;gap:20px;flex-wrap:wrap}
+.song-card{background:#111;padding:15px;border-radius:10px;width:180px;cursor:pointer}
+.song-art img{width:100%;height:150px;object-fit:cover}
+.song-name{margin-top:10px}
+.player{position:fixed;bottom:0;width:100%;background:#111;padding:10px}
+button{margin:5px}
+</style>
 </head>
 
 <body>
@@ -25,17 +23,14 @@
 
 {% for song in songs %}
 <div class="song-card"
-     onclick="playSong('{{ song[2] }}','{{ song[1] }}','{{ song[3] }}')">
+     onclick="playSong('{{ song[2] }}','{{ song[1] }}')">
 
     <div class="song-art">
-
         {% if song[3] %}
-        <!-- ✅ IMAGE FIX -->
         <img src="{{ url_for('static', filename=song[3]) }}">
         {% else %}
         <div>🎵</div>
         {% endif %}
-
     </div>
 
     <div class="song-name">{{ song[1] }}</div>
@@ -46,23 +41,68 @@
 </div>
 
 <!-- PLAYER -->
-<div style="position:fixed;bottom:0;width:100%;background:#111;padding:10px">
+<div class="player">
     <p id="title">Select Song</p>
-    <audio id="audio" controls style="width:100%"></audio>
+
+    <button onclick="prevSong()">⏮</button>
+    <button onclick="togglePlay()">▶ / ⏸</button>
+    <button onclick="nextSong()">⏭</button>
+
+    <audio id="audio" style="width:100%"></audio>
 </div>
 
 <script>
 
 let audio = document.getElementById("audio");
+let isPlaying = false;
 
-function playSong(file, title, img){
+let songs = [];
+let currentIndex = 0;
 
-    // ✅ FIXED PATH
+// songs load
+document.querySelectorAll(".song-card").forEach((card, index) => {
+    let file = card.getAttribute("onclick").split("'")[1];
+    let title = card.querySelector(".song-name").innerText;
+
+    songs.push({file, title});
+});
+
+function playSong(file, title){
     audio.src = "/static/" + file;
     audio.play();
+    isPlaying = true;
 
     document.getElementById("title").innerText = title;
+
+    currentIndex = songs.findIndex(s => s.file === file);
 }
+
+function togglePlay(){
+    if(!audio.src) return;
+
+    if(isPlaying){
+        audio.pause();
+        isPlaying = false;
+    } else {
+        audio.play();
+        isPlaying = true;
+    }
+}
+
+function nextSong(){
+    currentIndex = (currentIndex + 1) % songs.length;
+    let s = songs[currentIndex];
+    playSong(s.file, s.title);
+}
+
+function prevSong(){
+    currentIndex = (currentIndex - 1 + songs.length) % songs.length;
+    let s = songs[currentIndex];
+    playSong(s.file, s.title);
+}
+
+// auto next
+audio.addEventListener("ended", nextSong);
 
 </script>
 
