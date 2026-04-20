@@ -3,7 +3,7 @@ import sqlite3
 conn = sqlite3.connect("song.db")
 c = conn.cursor()
 
-# users
+# users table
 c.execute("""
 CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS users (
 )
 """)
 
-# songs
+# songs table
 c.execute("""
 CREATE TABLE IF NOT EXISTS songs (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

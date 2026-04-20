@@ -10,31 +10,16 @@
 <a href="/logout">Logout</a>
 
 <div class="songs">
-{% for song in songs %}
-<div class="card">
-
-    <img src="/static/{{ song.img }}">
-
-    <h3>{{ song.name }}</h3>
-
-    <button onclick="playSong('{{ song.file }}')">▶ Play</button>
-
+    {% for song in songs %}
+    <div class="card">
+        <img src="/static/{{song[3]}}" width="150">
+        <h3>{{song[1]}}</h3>
+        <audio controls>
+            <source src="/static/{{song[2]}}">
+        </audio>
+    </div>
+    {% endfor %}
 </div>
-{% endfor %}
-</div>
-
-<!-- SINGLE PLAYER -->
-<div class="player">
-    <audio id="player" controls></audio>
-</div>
-
-<script>
-function playSong(file){
-    let player = document.getElementById("player");
-    player.src = "/static/" + file;
-    player.play();
-}
-</script>
 
 </body>
 </html>
