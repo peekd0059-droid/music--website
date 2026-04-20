@@ -1,131 +1,105 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Melofy</title>
-
-    <!-- CSS LINK -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<title>Melofy</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 
 <body>
 
-<!-- HEADER -->
 <div class="header">
-    <h2>🎧 Melofy</h2>
+<h2>🎧 Melofy</h2>
 
-    <!-- SEARCH -->
-    <form action="/search" class="search">
-        <input type="text" name="q" placeholder="Search songs">
-    </form>
+<form action="/search" class="search">
+<input type="text" name="q" placeholder="Search songs">
+</form>
 
-    <a href="/liked" class="btn">❤️ Liked</a>
+<div>
+<a href="/liked" class="btn">❤️ Liked</a>
+<a href="/playlist" class="btn">📂 Playlist</a>
+</div>
 </div>
 
-<!-- PLAYLIST -->
 <div style="padding:20px 40px">
-    <form action="/create_playlist" method="POST">
-        <input name="name" placeholder="Create playlist">
-        <button>Create</button>
-    </form>
+<form action="/create_playlist" method="POST">
+<input name="name" placeholder="Create playlist">
+<button>Create</button>
+</form>
 </div>
 
-<!-- SONGS -->
 <div class="songs">
 
 {% for song in songs %}
 <div class="card">
 
-    <!-- IMAGE -->
-    {% if song[3] %}
-    <img src="{{ url_for('static', filename=song[3]) }}">
-    {% endif %}
+{% if song[3] %}
+<img src="{{ url_for('static', filename=song[3]) }}">
+{% endif %}
 
-    <!-- NAME -->
-    <h4>{{song[1]}}</h4>
+<h4>{{song[1]}}</h4>
 
-    <!-- PLAY -->
-    <button onclick="playSong('{{song[2]}}','{{song[1]}}')">▶ Play</button>
+<button onclick="playSong('{{song[2]}}','{{song[1]}}')">▶ Play</button>
 
-    <br><br>
+<br><br>
 
-    <!-- LIKE -->
-    <a href="/like/{{song[0]}}" class="btn">❤️ Like</a>
+<a href="/like/{{song[0]}}" class="btn">❤️ Like</a>
 
 </div>
 {% endfor %}
 
 </div>
 
-<!-- PLAYER -->
 <div class="player">
+<p id="title">Select song</p>
 
-    <p id="title">Select song</p>
-
-    <div>
-        <button onclick="prevSong()">⏮</button>
-        <button onclick="togglePlay()">⏯</button>
-        <button onclick="nextSong()">⏭</button>
-    </div>
-
-    <audio id="audio" controls style="width:50%"></audio>
-
+<div>
+<button onclick="prevSong()">⏮</button>
+<button onclick="togglePlay()">⏯</button>
+<button onclick="nextSong()">⏭</button>
 </div>
 
-<!-- SCRIPT -->
+<audio id="audio" controls style="width:50%"></audio>
+</div>
+
 <script>
-let audio = document.getElementById("audio");
-let isPlaying = false;
-let songs = [];
-let currentIndex = 0;
+let audio=document.getElementById("audio");
+let isPlaying=false;
+let songs=[];
+let currentIndex=0;
 
-/* LOAD SONGS */
-document.querySelectorAll(".card").forEach((card, i) => {
-    let btn = card.querySelector("button");
-    let file = btn.getAttribute("onclick").split("'")[1];
-    let title = card.querySelector("h4").innerText;
-
-    songs.push({file, title});
+document.querySelectorAll(".card").forEach((card,i)=>{
+let file=card.querySelector("button").getAttribute("onclick").split("'")[1];
+let title=card.querySelector("h4").innerText;
+songs.push({file,title});
 });
 
-/* PLAY */
-function playSong(file, title){
-    audio.src = "/static/" + file;
-    audio.play();
-    isPlaying = true;
-    document.getElementById("title").innerText = title;
-
-    currentIndex = songs.findIndex(s => s.file === file);
+function playSong(file,title){
+audio.src="/static/"+file;
+audio.play();
+isPlaying=true;
+document.getElementById("title").innerText=title;
+currentIndex=songs.findIndex(s=>s.file===file);
 }
 
-/* TOGGLE */
 function togglePlay(){
-    if(!audio.src) return;
-
-    if(isPlaying){
-        audio.pause();
-        isPlaying = false;
-    }else{
-        audio.play();
-        isPlaying = true;
-    }
+if(!audio.src) return;
+if(isPlaying){audio.pause();isPlaying=false;}
+else{audio.play();isPlaying=true;}
 }
 
-/* NEXT */
 function nextSong(){
-    currentIndex = (currentIndex + 1) % songs.length;
-    let s = songs[currentIndex];
-    playSong(s.file, s.title);
+currentIndex=(currentIndex+1)%songs.length;
+let s=songs[currentIndex];
+playSong(s.file,s.title);
 }
 
-/* PREV */
 function prevSong(){
-    currentIndex = (currentIndex - 1 + songs.length) % songs.length;
-    let s = songs[currentIndex];
-    playSong(s.file, s.title);
+currentIndex=(currentIndex-1+songs.length)%songs.length;
+let s=songs[currentIndex];
+playSong(s.file,s.title);
 }
 
-/* AUTO NEXT */
-audio.addEventListener("ended", nextSong);
+audio.addEventListener("ended",nextSong);
 </script>
 
 </body>

@@ -1,11 +1,8 @@
 from flask import Flask, render_template, request, redirect, session
-import sqlite3
+from utils.db import get_db
 
 app = Flask(__name__)
 app.secret_key = "secret123"
-
-def get_db():
-    return sqlite3.connect("song.db")
 
 
 # HOME
@@ -19,7 +16,7 @@ def home():
     return render_template("index.html", songs=songs)
 
 
-# 🔍 SEARCH
+# SEARCH
 @app.route('/search')
 def search():
     query = request.args.get("q")
@@ -33,7 +30,7 @@ def search():
     return render_template("index.html", songs=songs)
 
 
-# ❤️ LIKE
+# LIKE
 @app.route('/like/<int:song_id>')
 def like(song_id):
     username = session.get("user","guest")
@@ -47,7 +44,7 @@ def like(song_id):
     return redirect('/')
 
 
-# ❤️ LIKED PAGE
+# LIKED
 @app.route('/liked')
 def liked():
     username = session.get("user","guest")
@@ -65,7 +62,7 @@ def liked():
     return render_template("index.html", songs=songs)
 
 
-# 📂 PLAYLIST
+# CREATE PLAYLIST
 @app.route('/create_playlist', methods=["POST"])
 def create_playlist():
     name = request.form["name"]
@@ -78,6 +75,20 @@ def create_playlist():
     conn.close()
 
     return redirect('/')
+
+
+# SHOW PLAYLIST
+@app.route('/playlist')
+def playlist():
+    username = session.get("user","guest")
+
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("SELECT * FROM playlists WHERE username=?", (username,))
+    playlists = c.fetchall()
+    conn.close()
+
+    return render_template("playlist.html", playlists=playlists)
 
 
 if __name__ == "__main__":

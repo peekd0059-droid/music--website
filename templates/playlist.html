@@ -1,24 +1,23 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Playlists</title>
+<title>Playlist</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
+
 <body>
 
-<h1>Your Playlists</h1>
+<h2 style="padding:20px">📂 Your Playlists</h2>
 
-<form action="/create_playlist" method="POST">
-    <input type="text" name="name" placeholder="Playlist name">
-    <button>Create</button>
-</form>
+<div class="songs">
 
-<ul>
 {% for p in playlists %}
-    <li>{{ p[2] }} (ID: {{ p[0] }})</li>
+<div class="card">
+<h3>{{p[2]}}</h3>
+</div>
 {% endfor %}
-</ul>
 
-<a href="/">⬅ Back</a>
+</div>
 
 </body>
 </html>

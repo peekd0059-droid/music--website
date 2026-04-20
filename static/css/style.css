@@ -1,96 +1,73 @@
 body{
-    background:#0a0a0f;
-    color:white;
-    margin:0;
-    font-family:sans-serif;
+background:#0a0a0f;
+color:white;
+margin:0;
+font-family:sans-serif;
 }
 
-/* HEADER */
 .header{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:20px 40px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:20px 40px;
 }
 
-/* SEARCH */
 .search input{
-    padding:10px;
-    border-radius:20px;
-    border:none;
-    width:250px;
-    outline:none;
+padding:10px;
+border-radius:20px;
+border:none;
+width:250px;
 }
 
-/* SONG GRID */
 .songs{
-    display:flex;
-    gap:25px;
-    padding:20px 40px;
-    flex-wrap:wrap;
+display:flex;
+gap:25px;
+padding:20px 40px;
+flex-wrap:wrap;
 }
 
-/* CARD */
 .card{
-    background:#111;
-    padding:15px;
-    border-radius:15px;
-    width:200px;
-    transition:0.3s;
+background:#111;
+padding:15px;
+border-radius:15px;
+width:200px;
+transition:0.3s;
 }
 
 .card:hover{
-    transform:scale(1.05);
-    background:#181818;
+transform:scale(1.05);
+background:#181818;
 }
 
-/* IMAGE */
 .card img{
-    width:100%;
-    height:150px;
-    object-fit:cover;
-    border-radius:10px;
+width:100%;
+height:150px;
+object-fit:cover;
+border-radius:10px;
 }
 
-/* TITLE */
-.card h4{
-    margin:10px 0;
-}
-
-/* BUTTON */
 button{
-    background:#1db954;
-    border:none;
-    padding:8px 15px;
-    border-radius:20px;
-    cursor:pointer;
-    color:white;
+background:#1db954;
+border:none;
+padding:8px 15px;
+border-radius:20px;
+cursor:pointer;
+color:white;
 }
 
-button:hover{
-    opacity:0.8;
-}
-
-/* LINK BUTTON */
 .btn{
-    color:#1db954;
-    text-decoration:none;
-    font-weight:bold;
+color:#1db954;
+text-decoration:none;
+margin-left:10px;
 }
 
-/* PLAYER */
 .player{
-    position:fixed;
-    bottom:0;
-    width:100%;
-    background:#111;
-    padding:15px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-}
-
-/* PLAYER BUTTONS */
-.player button{
-    margin:0 5px;
+position:fixed;
+bottom:0;
+width:100%;
+background:#111;
+padding:15px;
+display:flex;
+justify-content:space-between;
+align-items:center;
 }
