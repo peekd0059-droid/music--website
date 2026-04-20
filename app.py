@@ -85,6 +85,5 @@ def liked():
 
     return render_template("liked.html", songs=songs)
 
-
 if __name__ == "__main__":
     app.run(debug=True)
