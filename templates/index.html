@@ -2,11 +2,13 @@
 <html>
 <head>
 <title>Melofy</title>
+
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 
 <body>
 
+<!-- HEADER -->
 <div class="header">
 <h2>🎧 Melofy</h2>
 
@@ -20,6 +22,7 @@
 </div>
 </div>
 
+<!-- PLAYLIST CREATE -->
 <div style="padding:20px 40px">
 <form action="/create_playlist" method="POST">
 <input name="name" placeholder="Create playlist">
@@ -27,6 +30,7 @@
 </form>
 </div>
 
+<!-- SONGS -->
 <div class="songs">
 
 {% for song in songs %}
@@ -42,6 +46,7 @@
 
 <br><br>
 
+<!-- ❤️ LIKE -->
 <a href="/like/{{song[0]}}" class="btn">
 {% if liked_ids and song[0] in liked_ids %}
 ❤️
@@ -50,12 +55,26 @@
 {% endif %}
 </a>
 
+<br><br>
+
+<!-- 🎵 ADD TO PLAYLIST -->
+<form action="/add_to_playlist/{{song[0]}}" method="POST">
+<select name="playlist_id">
+{% for p in playlists %}
+<option value="{{p[0]}}">{{p[2]}}</option>
+{% endfor %}
+</select>
+<button>Add</button>
+</form>
+
 </div>
 {% endfor %}
 
 </div>
 
+<!-- PLAYER -->
 <div class="player">
+
 <p id="title">Select song</p>
 
 <div>
@@ -65,8 +84,10 @@
 </div>
 
 <audio id="audio" controls style="width:50%"></audio>
+
 </div>
 
+<!-- SCRIPT -->
 <script>
 let audio=document.getElementById("audio");
 let isPlaying=false;
