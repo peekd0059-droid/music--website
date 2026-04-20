@@ -9,10 +9,11 @@ def get_db():
     conn.row_factory = sqlite3.Row
     return conn
 
-# Create tables
+# ================= DATABASE =================
 conn = get_db()
 c = conn.cursor()
 
+# Songs
 c.execute("""
 CREATE TABLE IF NOT EXISTS songs (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -22,22 +23,36 @@ CREATE TABLE IF NOT EXISTS songs (
 )
 """)
 
+# Users
+c.execute("""
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT,
+    password TEXT
+)
+""")
+
+# ❤️ User-wise liked songs
 c.execute("""
 CREATE TABLE IF NOT EXISTS liked_songs (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user TEXT,
     name TEXT,
     file TEXT,
     image TEXT
 )
 """)
 
+# Playlist
 c.execute("""
 CREATE TABLE IF NOT EXISTS playlists (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user TEXT,
     name TEXT
 )
 """)
 
+# Playlist songs
 c.execute("""
 CREATE TABLE IF NOT EXISTS playlist_songs (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -48,18 +63,10 @@ CREATE TABLE IF NOT EXISTS playlist_songs (
 )
 """)
 
-c.execute("""
-CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT,
-    password TEXT
-)
-""")
-
 conn.commit()
 conn.close()
 
-# Home (protected)
+# ================= HOME =================
 @app.route("/")
 def home():
     if "user" not in session:
@@ -82,7 +89,7 @@ def home():
     conn.close()
     return render_template("index.html", songs=songs)
 
-# Signup
+# ================= SIGNUP =================
 @app.route("/signup", methods=["GET","POST"])
 def signup():
     if request.method == "POST":
@@ -100,7 +107,7 @@ def signup():
 
     return render_template("signup.html")
 
-# Login
+# ================= LOGIN =================
 @app.route("/login", methods=["GET","POST"])
 def login():
     if request.method == "POST":
@@ -123,37 +130,43 @@ def login():
 
     return render_template("login.html")
 
-# Logout
+# ================= LOGOUT =================
 @app.route("/logout")
 def logout():
     session.pop("user", None)
     return redirect("/login")
 
-# ❤️ Like
+# ================= ❤️ LIKE =================
 @app.route("/like", methods=["POST"])
 def like_song():
+    if "user" not in session:
+        return "Login required"
+
     data = request.get_json()
 
     conn = get_db()
     c = conn.cursor()
 
-    c.execute(
-        "INSERT INTO liked_songs (name, file, image) VALUES (?, ?, ?)",
-        (data["name"], data["file"], data["image"])
-    )
+    c.execute("""
+    INSERT INTO liked_songs (user, name, file, image)
+    VALUES (?, ?, ?, ?)
+    """, (session["user"], data["name"], data["file"], data["image"]))
 
     conn.commit()
     conn.close()
 
     return jsonify({"status":"ok"})
 
-# ❤️ Liked Page
+# ================= ❤️ LIKED PAGE =================
 @app.route("/liked")
 def liked():
+    if "user" not in session:
+        return redirect("/login")
+
     conn = get_db()
     c = conn.cursor()
 
-    c.execute("SELECT * FROM liked_songs")
+    c.execute("SELECT * FROM liked_songs WHERE user=?", (session["user"],))
     data = c.fetchall()
 
     songs = []
@@ -167,7 +180,7 @@ def liked():
     conn.close()
     return render_template("liked.html", songs=songs)
 
-# Playlist Create
+# ================= 📂 CREATE PLAYLIST =================
 @app.route("/create_playlist", methods=["POST"])
 def create_playlist():
     name = request.form["name"]
@@ -175,13 +188,13 @@ def create_playlist():
     conn = get_db()
     c = conn.cursor()
 
-    c.execute("INSERT INTO playlists (name) VALUES (?)", (name,))
+    c.execute("INSERT INTO playlists (user, name) VALUES (?, ?)", (session["user"], name))
     conn.commit()
     conn.close()
 
     return redirect("/")
 
-# Add to Playlist
+# ================= ➕ ADD TO PLAYLIST =================
 @app.route("/add_to_playlist", methods=["POST"])
 def add_to_playlist():
     data = request.get_json()
@@ -199,7 +212,7 @@ def add_to_playlist():
 
     return "OK"
 
-# View Playlist
+# ================= VIEW PLAYLIST =================
 @app.route("/playlist/<int:id>")
 def view_playlist(id):
     conn = get_db()
@@ -215,5 +228,6 @@ def view_playlist(id):
 
     return render_template("playlist.html", playlist=playlist, songs=songs)
 
+# ================= RUN =================
 if __name__ == "__main__":
     app.run(debug=True)
