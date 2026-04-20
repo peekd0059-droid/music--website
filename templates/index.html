@@ -52,6 +52,7 @@
             color:white;
             border-radius:20px;
             cursor:pointer;
+            margin-top:5px;
         }
 
         .songs{
@@ -93,13 +94,15 @@
 
 <body>
 
+<!-- Sidebar -->
 <div class="sidebar">
     <h2>Melofy</h2>
     <p>Home</p>
     <p>Search</p>
-    <p>Your Library</p>
+    <p onclick="window.location.href='/liked'">❤️ Liked Songs</p>
 </div>
 
+<!-- Main -->
 <div class="main">
 
     <h1>Melofy</h1>
@@ -110,6 +113,7 @@
 
     <!-- Songs -->
     <div class="songs">
+
         {% for song in songs %}
         <div class="card">
 
@@ -119,14 +123,22 @@
 
             <button onclick="playSong({{ loop.index0 }})">▶ Play</button>
 
+            <!-- ❤️ Like Button -->
+            <button onclick="likeSong('{{ song['name'] }}','{{ song['file'] }}','{{ song['image'] }}')" 
+            style="background:none; border:none;">
+            ❤️
+            </button>
+
         </div>
         {% endfor %}
+
     </div>
 
 </div>
 
 <!-- Player -->
 <div class="player">
+
     <h3 id="nowPlaying">No song playing</h3>
 
     <button onclick="prevSong()">⏮</button>
@@ -136,6 +148,7 @@
     <br><br>
 
     <audio id="player" controls style="width:300px;"></audio>
+
 </div>
 
 <script>
@@ -208,6 +221,23 @@ function searchSongs(){
             cards[i].style.display="none";
         }
     }
+}
+
+// ❤️ Like
+function likeSong(name, file, image){
+    fetch("/like", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            name: name,
+            file: file,
+            image: image
+        })
+    }).then(() => {
+        alert("❤️ Added to Liked Songs");
+    });
 }
 
 </script>

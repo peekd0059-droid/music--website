@@ -1,68 +1,79 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, jsonify
 import sqlite3
 import os
 
 app = Flask(__name__)
 
-UPLOAD_FOLDER = "static/songs"
-IMAGE_FOLDER = "static/images"
+# DB
+conn = sqlite3.connect("songs.db", check_same_thread=False)
+cursor = conn.cursor()
 
-# Ensure folders exist
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-os.makedirs(IMAGE_FOLDER, exist_ok=True)
+# Create tables
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS songs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT,
+    file TEXT,
+    image TEXT
+)
+""")
 
-# DB connection
-def get_db():
-    conn = sqlite3.connect("songs.db")
-    conn.row_factory = sqlite3.Row
-    return conn
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS liked_songs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT,
+    file TEXT,
+    image TEXT
+)
+""")
 
-# Create table if not exists
-def init_db():
-    conn = get_db()
-    conn.execute("""
-        CREATE TABLE IF NOT EXISTS songs (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT,
-            file TEXT,
-            image TEXT
-        )
-    """)
-    conn.commit()
-    conn.close()
+conn.commit()
 
-init_db()
-
-# Home page
+# Home
 @app.route("/")
-def index():
-    conn = get_db()
-    songs = conn.execute("SELECT * FROM songs").fetchall()
-    conn.close()
+def home():
+    cursor.execute("SELECT * FROM songs")
+    data = cursor.fetchall()
+
+    songs = []
+    for row in data:
+        songs.append({
+            "name": row[1],
+            "file": row[2],
+            "image": row[3]
+        })
+
     return render_template("index.html", songs=songs)
 
-# Upload (admin use)
-@app.route("/upload", methods=["POST"])
-def upload():
-    song = request.files.get("song")
-    image = request.files.get("image")
+# ❤️ Like API
+@app.route("/like", methods=["POST"])
+def like_song():
+    data = request.json
 
-    if song and image:
-        song_filename = song.filename
-        image_filename = image.filename
+    cursor.execute(
+        "INSERT INTO liked_songs (name, file, image) VALUES (?, ?, ?)",
+        (data["name"], data["file"], data["image"])
+    )
+    conn.commit()
 
-        song.save(os.path.join(UPLOAD_FOLDER, song_filename))
-        image.save(os.path.join(IMAGE_FOLDER, image_filename))
+    return jsonify({"status": "ok"})
 
-        conn = get_db()
-        conn.execute(
-            "INSERT INTO songs (name, file, image) VALUES (?, ?, ?)",
-            (song_filename.split(".")[0], song_filename, image_filename)
-        )
-        conn.commit()
-        conn.close()
+# ❤️ Liked page
+@app.route("/liked")
+def liked():
+    cursor.execute("SELECT * FROM liked_songs")
+    data = cursor.fetchall()
 
-    return redirect("/")
+    songs = []
+    for row in data:
+        songs.append({
+            "name": row[1],
+            "file": row[2],
+            "image": row[3]
+        })
+
+    return render_template("liked.html", songs=songs)
+
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
