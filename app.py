@@ -1,7 +1,8 @@
-from flask import Flask, render_template, request, jsonify, redirect
+from flask import Flask, render_template, request, jsonify, redirect, session
 import sqlite3
 
 app = Flask(__name__)
+app.secret_key = "secret123"
 
 def get_db():
     conn = sqlite3.connect("songs.db")
@@ -47,12 +48,23 @@ CREATE TABLE IF NOT EXISTS playlist_songs (
 )
 """)
 
+c.execute("""
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT,
+    password TEXT
+)
+""")
+
 conn.commit()
 conn.close()
 
-# Home
+# Home (protected)
 @app.route("/")
 def home():
+    if "user" not in session:
+        return redirect("/login")
+
     conn = get_db()
     c = conn.cursor()
 
@@ -70,6 +82,53 @@ def home():
     conn.close()
     return render_template("index.html", songs=songs)
 
+# Signup
+@app.route("/signup", methods=["GET","POST"])
+def signup():
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+
+        conn = get_db()
+        c = conn.cursor()
+
+        c.execute("INSERT INTO users (username, password) VALUES (?, ?)", (username, password))
+        conn.commit()
+        conn.close()
+
+        return redirect("/login")
+
+    return render_template("signup.html")
+
+# Login
+@app.route("/login", methods=["GET","POST"])
+def login():
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+
+        conn = get_db()
+        c = conn.cursor()
+
+        c.execute("SELECT * FROM users WHERE username=? AND password=?", (username, password))
+        user = c.fetchone()
+
+        conn.close()
+
+        if user:
+            session["user"] = username
+            return redirect("/")
+        else:
+            return "Invalid Login"
+
+    return render_template("login.html")
+
+# Logout
+@app.route("/logout")
+def logout():
+    session.pop("user", None)
+    return redirect("/login")
+
 # ❤️ Like
 @app.route("/like", methods=["POST"])
 def like_song():
@@ -86,7 +145,7 @@ def like_song():
     conn.commit()
     conn.close()
 
-    return jsonify({"status": "ok"})
+    return jsonify({"status":"ok"})
 
 # ❤️ Liked Page
 @app.route("/liked")
@@ -108,7 +167,7 @@ def liked():
     conn.close()
     return render_template("liked.html", songs=songs)
 
-# 🎵 Create Playlist
+# Playlist Create
 @app.route("/create_playlist", methods=["POST"])
 def create_playlist():
     name = request.form["name"]
@@ -122,7 +181,7 @@ def create_playlist():
 
     return redirect("/")
 
-# ➕ Add to Playlist
+# Add to Playlist
 @app.route("/add_to_playlist", methods=["POST"])
 def add_to_playlist():
     data = request.get_json()
@@ -140,7 +199,7 @@ def add_to_playlist():
 
     return "OK"
 
-# 📂 View Playlist
+# View Playlist
 @app.route("/playlist/<int:id>")
 def view_playlist(id):
     conn = get_db()

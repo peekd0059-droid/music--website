@@ -19,12 +19,15 @@ body{margin:0;background:#121212;color:white;font-family:Arial;display:flex;}
 
 <body>
 
+<!-- Sidebar -->
 <div class="sidebar">
 <h2>Melofy</h2>
-<p>Home</p>
+<p onclick="window.location.href='/'">Home</p>
 <p onclick="window.location.href='/liked'">❤️ Liked</p>
+<p onclick="window.location.href='/logout'">🚪 Logout</p>
 </div>
 
+<!-- Main -->
 <div class="main">
 
 <h1>Melofy</h1>
@@ -35,6 +38,7 @@ body{margin:0;background:#121212;color:white;font-family:Arial;display:flex;}
 <button>Create</button>
 </form>
 
+<!-- Songs -->
 <div class="songs">
 
 {% for song in songs %}
@@ -46,9 +50,16 @@ body{margin:0;background:#121212;color:white;font-family:Arial;display:flex;}
 
 <button onclick="playSong({{ loop.index0 }})">▶</button>
 
-<button onclick="likeSong(this,'{{ song['name'] }}','{{ song['file'] }}','{{ song['image'] }}')" style="background:none;border:none;">❤️</button>
+<!-- ❤️ Like -->
+<button onclick="likeSong(this,'{{ song['name'] }}','{{ song['file'] }}','{{ song['image'] }}')" 
+style="background:none;border:none;font-size:18px;">
+❤️
+</button>
 
-<button onclick="addToPlaylist('{{ song['name'] }}','{{ song['file'] }}','{{ song['image'] }}')">➕</button>
+<!-- ➕ Playlist -->
+<button onclick="addToPlaylist('{{ song['name'] }}','{{ song['file'] }}','{{ song['image'] }}')">
+➕
+</button>
 
 </div>
 {% endfor %}
@@ -57,17 +68,23 @@ body{margin:0;background:#121212;color:white;font-family:Arial;display:flex;}
 
 </div>
 
+<!-- Player -->
 <div class="player">
+
 <h3 id="nowPlaying">No song</h3>
 
 <button onclick="prevSong()">⏮</button>
 <button onclick="togglePlay()">⏯</button>
 <button onclick="nextSong()">⏭</button>
 
-<audio id="player" controls></audio>
+<br><br>
+
+<audio id="player" controls style="width:300px;"></audio>
+
 </div>
 
 <script>
+
 let songs=[],names=[],currentIndex=0;
 
 {% for song in songs %}
@@ -78,6 +95,7 @@ names.push("{{ song['name'] }}");
 let player=document.getElementById("player");
 let nowPlaying=document.getElementById("nowPlaying");
 
+// Play
 function playSong(i){
 currentIndex=i;
 player.src=songs[i];
@@ -85,15 +103,18 @@ player.play();
 nowPlaying.innerText=names[i];
 }
 
+// Toggle
 function togglePlay(){
 player.paused?player.play():player.pause();
 }
 
+// Next
 function nextSong(){
 currentIndex=(currentIndex+1)%songs.length;
 playSong(currentIndex);
 }
 
+// Prev
 function prevSong(){
 currentIndex=(currentIndex-1+songs.length)%songs.length;
 playSong(currentIndex);
@@ -110,11 +131,12 @@ body:JSON.stringify({name,file,image})})
 
 // ➕ Playlist
 function addToPlaylist(name,file,image){
-let id=prompt("Playlist ID");
+let id=prompt("Enter Playlist ID");
 fetch("/add_to_playlist",{method:"POST",headers:{"Content-Type":"application/json"},
 body:JSON.stringify({playlist_id:id,name,file,image})})
-.then(()=>alert("Added"));
+.then(()=>alert("Added to Playlist"));
 }
+
 </script>
 
 </body>
