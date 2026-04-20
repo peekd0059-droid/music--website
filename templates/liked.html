@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Liked Songs</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+<h1>❤️ Liked Songs</h1>
+
+<div class="songs">
+
+{% for song in songs %}
+<div class="card">
+    <img src="{{ song.image }}" width="150">
+    <h3>{{ song.name }}</h3>
+
+    <audio controls>
+        <source src="{{ song.file }}">
+    </audio>
+</div>
+{% endfor %}
+
+</div>
+
+</body>
+</html>
