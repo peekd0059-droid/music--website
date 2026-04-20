@@ -1,10 +1,9 @@
-from flask import Flask, render_template, request, redirect, jsonify
+from flask import Flask, render_template, request, jsonify
 import sqlite3
-import os
 
 app = Flask(__name__)
 
-# DB
+# Database connection
 conn = sqlite3.connect("songs.db", check_same_thread=False)
 cursor = conn.cursor()
 
@@ -29,7 +28,8 @@ CREATE TABLE IF NOT EXISTS liked_songs (
 
 conn.commit()
 
-# Home
+
+# Home route
 @app.route("/")
 def home():
     cursor.execute("SELECT * FROM songs")
@@ -45,18 +45,29 @@ def home():
 
     return render_template("index.html", songs=songs)
 
-# ❤️ Like API
+
+# ❤️ Like route (FIXED)
 @app.route("/like", methods=["POST"])
 def like_song():
-    data = request.json
+    try:
+        data = request.get_json()
 
-    cursor.execute(
-        "INSERT INTO liked_songs (name, file, image) VALUES (?, ?, ?)",
-        (data["name"], data["file"], data["image"])
-    )
-    conn.commit()
+        name = data.get("name")
+        file = data.get("file")
+        image = data.get("image")
 
-    return jsonify({"status": "ok"})
+        cursor.execute(
+            "INSERT INTO liked_songs (name, file, image) VALUES (?, ?, ?)",
+            (name, file, image)
+        )
+        conn.commit()
+
+        return jsonify({"status": "success"})
+
+    except Exception as e:
+        print("ERROR:", e)
+        return jsonify({"status": "error"})
+
 
 # ❤️ Liked page
 @app.route("/liked")
@@ -76,4 +87,4 @@ def liked():
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
