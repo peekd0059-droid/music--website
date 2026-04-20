@@ -16,7 +16,6 @@ def init_db():
     conn = get_db()
     c = conn.cursor()
 
-    # users
     c.execute("""
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -25,7 +24,6 @@ def init_db():
     )
     """)
 
-    # liked songs
     c.execute("""
     CREATE TABLE IF NOT EXISTS liked (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -41,7 +39,7 @@ def init_db():
 init_db()
 
 
-# ===== HOME (Spotify UI) =====
+# ===== HOME =====
 @app.route("/")
 def home():
     if "user" not in session:
@@ -55,7 +53,7 @@ def home():
     return render_template("index.html", songs=songs)
 
 
-# ===== LIKE SONG =====
+# ===== LIKE =====
 @app.route("/like/<song>")
 def like(song):
     if "user" not in session:
@@ -72,7 +70,7 @@ def like(song):
     return redirect("/")
 
 
-# ===== LIKED PAGE =====
+# ===== LIKED =====
 @app.route("/liked")
 def liked():
     if "user" not in session:
@@ -87,28 +85,6 @@ def liked():
     conn.close()
 
     return render_template("liked.html", songs=songs)
-
-
-# ===== SIGNUP =====
-@app.route("/signup", methods=["GET", "POST"])
-def signup():
-    if request.method == "POST":
-        username = request.form.get("username")
-        password = request.form.get("password")
-
-        conn = get_db()
-        c = conn.cursor()
-
-        try:
-            c.execute("INSERT INTO users (username, password) VALUES (?, ?)", (username, password))
-            conn.commit()
-        except:
-            return "User already exists"
-
-        conn.close()
-        return redirect("/login")
-
-    return render_template("signup.html")
 
 
 # ===== LOGIN =====
@@ -133,6 +109,28 @@ def login():
             return "Wrong username or password"
 
     return render_template("login.html")
+
+
+# ===== SIGNUP =====
+@app.route("/signup", methods=["GET", "POST"])
+def signup():
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+
+        conn = get_db()
+        c = conn.cursor()
+
+        try:
+            c.execute("INSERT INTO users VALUES (NULL, ?, ?)", (username, password))
+            conn.commit()
+        except:
+            return "User already exists"
+
+        conn.close()
+        return redirect("/login")
+
+    return render_template("signup.html")
 
 
 # ===== LOGOUT =====

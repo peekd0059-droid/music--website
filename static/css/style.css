@@ -1,48 +1,49 @@
-body{
-    background:#121212;
-    color:white;
-    font-family: Arial, sans-serif;
+body {
+    background: #121212;
+    color: white;
+    font-family: Arial;
+    margin: 0;
 }
 
-/* Songs container */
-.songs{
-    display:flex;
-    flex-wrap:wrap;
-    gap:20px;
-    padding:20px;
+h1 {
+    padding: 20px;
 }
 
-/* Card */
-.card{
-    background:#181818;
-    padding:15px;
-    border-radius:12px;
-    width:180px;
-    text-align:center;
-    transition:0.3s;
+.nav {
+    padding: 0 20px;
 }
 
-.card:hover{
-    background:#282828;
-    transform:scale(1.05);
+.nav a {
+    margin-right: 15px;
+    color: #1db954;
 }
 
-/* Image */
-.card img{
-    width:100%;
-    border-radius:10px;
+.songs {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
 }
 
-/* Button */
-button{
-    background:#1db954;
-    border:none;
-    padding:8px 12px;
-    color:white;
-    border-radius:20px;
-    cursor:pointer;
+.card {
+    background: #181818;
+    padding: 15px;
+    border-radius: 10px;
+    width: 220px;
+    text-align: center;
 }
 
-button:hover{
-    background:#1ed760;
+.card img {
+    width: 100%;
+    border-radius: 10px;
+}
+
+audio {
+    width: 100%;
+    margin-top: 10px;
+}
+
+.card a {
+    display: block;
+    margin-top: 10px;
+    color: red;
 }

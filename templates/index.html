@@ -8,30 +8,29 @@
 
 <h1>🎧 Melofy</h1>
 
-<a href="/liked">❤️ Liked Songs</a> |
-<a href="/logout">Logout</a>
+<div class="nav">
+    <a href="/liked">❤️ Liked Songs</a>
+    <a href="/logout">Logout</a>
+</div>
 
 <div class="songs">
-
 {% for song in songs %}
-<div class="card">
+    <div class="card">
 
-    <img src="/static/{{ song.img }}" width="150">
+        <img src="/static/{{ song.img }}">
 
-    <h3>{{ song.name }}</h3>
+        <h3>{{ song.name }}</h3>
 
-    <audio controls>
-        <source src="/static/{{ song.file }}">
-    </audio>
+        <audio controls>
+            <source src="/static/{{ song.file }}">
+        </audio>
 
-    <br>
+        <a href="/like/{{ song.name }}">❤️ Like</a>
 
-    <a href="/like/{{ song.name }}">❤️ Like</a>
-
-</div>
+    </div>
 {% endfor %}
-
 </div>
 
 </body>
+</html>
 </html>
