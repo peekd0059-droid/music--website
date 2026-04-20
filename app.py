@@ -9,7 +9,7 @@ def get_db():
     conn.row_factory = sqlite3.Row
     return conn
 
-# ===== INIT DB =====
+# ===== INIT DATABASE =====
 conn = get_db()
 c = conn.cursor()
 
@@ -95,18 +95,27 @@ def like_song():
     if "user" not in session:
         return "Login required"
 
-    data = request.get_json()
+    try:
+        data = request.get_json()
 
-    conn = get_db()
-    c = conn.cursor()
+        name = data.get("name")
+        file = data.get("file")
+        image = data.get("image")
 
-    c.execute("INSERT INTO liked_songs (user,name,file,image) VALUES (?,?,?,?)",
-              (session["user"], data["name"], data["file"], data["image"]))
+        conn = get_db()
+        c = conn.cursor()
 
-    conn.commit()
-    conn.close()
+        c.execute("INSERT INTO liked_songs (user,name,file,image) VALUES (?,?,?,?)",
+                  (session["user"], name, file, image))
 
-    return jsonify({"status":"ok"})
+        conn.commit()
+        conn.close()
+
+        return jsonify({"status":"ok"})
+
+    except Exception as e:
+        print("ERROR:", e)
+        return "Error"
 
 # ===== LIKED PAGE =====
 @app.route("/liked")

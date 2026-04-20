@@ -1,142 +1,60 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Melofy</title>
-
-<style>
-body{margin:0;background:#121212;color:white;font-family:Arial;display:flex;}
-.sidebar{width:200px;background:#000;height:100vh;padding:20px;}
-.sidebar h2{color:#1db954;}
-.sidebar p{margin:15px 0;color:#b3b3b3;cursor:pointer;}
-.sidebar p:hover{color:white;}
-.main{flex:1;padding:20px;}
-.songs{display:flex;flex-wrap:wrap;gap:20px;margin-top:20px;}
-.card{background:#181818;padding:15px;border-radius:10px;width:180px;text-align:center;}
-.card img{width:100%;border-radius:10px;}
-.player{position:fixed;bottom:0;left:200px;right:0;background:#181818;padding:10px;}
-</style>
+    <title>Melofy</title>
+    <link rel="stylesheet" href="/static/css/style.css">
 </head>
 
 <body>
 
-<!-- Sidebar -->
-<div class="sidebar">
-<h2>Melofy</h2>
-<p onclick="window.location.href='/'">Home</p>
-<p onclick="window.location.href='/liked'">❤️ Liked</p>
-<p onclick="window.location.href='/logout'">🚪 Logout</p>
-</div>
-
-<!-- Main -->
-<div class="main">
-
 <h1>Melofy</h1>
 
-<!-- Create Playlist -->
-<form action="/create_playlist" method="post">
-<input name="name" placeholder="Playlist name">
-<button>Create</button>
-</form>
+<a href="/liked">❤️ Liked Songs</a>
+<a href="/logout">Logout</a>
 
-<!-- Songs -->
 <div class="songs">
 
 {% for song in songs %}
 <div class="card">
 
-<img src="{{ url_for('static', filename='images/' + song['image']) }}">
+    <img src="{{ song.image }}" width="150">
+    <h3>{{ song.name }}</h3>
 
-<h3>{{ song['name'] }}</h3>
+    <button onclick="playSong('{{ song.file }}')">▶</button>
 
-<button onclick="playSong({{ loop.index0 }})">▶</button>
-
-<!-- ❤️ Like -->
-<button onclick="likeSong(this,'{{ song['name'] }}','{{ song['file'] }}','{{ song['image'] }}')" 
-style="background:none;border:none;font-size:18px;">
-❤️
-</button>
-
-<!-- ➕ Playlist -->
-<button onclick="addToPlaylist('{{ song['name'] }}','{{ song['file'] }}','{{ song['image'] }}')">
-➕
-</button>
+    <button onclick="likeSong('{{ song.name }}','{{ song.file }}','{{ song.image }}')">❤️</button>
 
 </div>
 {% endfor %}
 
 </div>
 
-</div>
-
-<!-- Player -->
-<div class="player">
-
-<h3 id="nowPlaying">No song</h3>
-
-<button onclick="prevSong()">⏮</button>
-<button onclick="togglePlay()">⏯</button>
-<button onclick="nextSong()">⏭</button>
-
-<br><br>
-
-<audio id="player" controls style="width:300px;"></audio>
-
-</div>
+<audio id="player" controls></audio>
 
 <script>
-
-let songs=[],names=[],currentIndex=0;
-
-{% for song in songs %}
-songs.push("{{ url_for('static', filename='songs/' + song['file']) }}");
-names.push("{{ song['name'] }}");
-{% endfor %}
-
-let player=document.getElementById("player");
-let nowPlaying=document.getElementById("nowPlaying");
-
-// Play
-function playSong(i){
-currentIndex=i;
-player.src=songs[i];
-player.play();
-nowPlaying.innerText=names[i];
+function playSong(file){
+    let player = document.getElementById("player");
+    player.src = file;
+    player.play();
 }
 
-// Toggle
-function togglePlay(){
-player.paused?player.play():player.pause();
+function likeSong(name,file,image){
+    fetch("/like",{
+        method:"POST",
+        headers:{
+            "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+            name:name,
+            file:file,
+            image:image
+        })
+    })
+    .then(res=>res.json())
+    .then(data=>{
+        alert("Liked ❤️");
+    })
 }
-
-// Next
-function nextSong(){
-currentIndex=(currentIndex+1)%songs.length;
-playSong(currentIndex);
-}
-
-// Prev
-function prevSong(){
-currentIndex=(currentIndex-1+songs.length)%songs.length;
-playSong(currentIndex);
-}
-
-player.onended=nextSong;
-
-// ❤️ Like
-function likeSong(btn,name,file,image){
-fetch("/like",{method:"POST",headers:{"Content-Type":"application/json"},
-body:JSON.stringify({name,file,image})})
-.then(()=>{btn.innerText="💚";});
-}
-
-// ➕ Playlist
-function addToPlaylist(name,file,image){
-let id=prompt("Enter Playlist ID");
-fetch("/add_to_playlist",{method:"POST",headers:{"Content-Type":"application/json"},
-body:JSON.stringify({playlist_id:id,name,file,image})})
-.then(()=>alert("Added to Playlist"));
-}
-
 </script>
 
 </body>
