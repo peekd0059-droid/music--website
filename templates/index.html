@@ -6,56 +6,25 @@
 </head>
 <body>
 
-<!-- NAVBAR -->
-<div class="navbar">
-    <h2>🎧 Melofy</h2>
+<h1>🎧 Melofy</h1>
 
-    <input type="text" id="search" placeholder="Search songs..." onkeyup="searchSong()">
+<a href="/logout">Logout</a>
 
-    <div class="nav-links">
-        <a href="/playlists">📂 Playlists</a>
-        <a href="/logout">Logout</a>
-    </div>
-</div>
-
-<!-- SONG GRID -->
-<div class="songs" id="songs">
+<div class="songs">
 {% for song in songs %}
 <div class="card">
 
-    <!-- ✅ FIXED IMAGE PATH -->
-    <img src="{{ url_for('static', filename=song.img) }}">
+    <img src="/static/{{ song.img }}">
 
     <h3>{{ song.name }}</h3>
 
-    <button onclick="playSong('{{ song.file }}')">▶ Play</button>
+    <audio controls>
+        <source src="/static/{{ song.file }}">
+    </audio>
 
 </div>
 {% endfor %}
 </div>
-
-<!-- 🎧 CENTER PLAYER -->
-<div class="player">
-    <audio id="player" controls></audio>
-</div>
-
-<script>
-function playSong(file){
-    let player = document.getElementById("player");
-    player.src = "/static/" + file;
-    player.play();
-}
-
-function searchSong(){
-    let input = document.getElementById("search").value.toLowerCase();
-    let cards = document.querySelectorAll(".card");
-
-    cards.forEach(c=>{
-        let text = c.innerText.toLowerCase();
-        c.style.display = text.includes(input) ? "block" : "none";
-    });
-}
-</script>
 
 </body>
 </html>

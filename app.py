@@ -35,7 +35,7 @@ def init_db():
 
 init_db()
 
-# ===== INSERT DEFAULT SONGS =====
+# ===== AUTO INSERT SONGS =====
 def insert_default_songs():
     conn = get_db()
     c = conn.cursor()
@@ -70,7 +70,6 @@ def home():
     songs = []
 
     for s in data:
-        # 🔥 IMAGE AUTO MATCH
         if "DR MOB" in s[1]:
             img = "images/drmob.jpg"
         else:
@@ -85,7 +84,7 @@ def home():
     return render_template("index.html", songs=songs)
 
 # ===== LOGIN =====
-@app.route("/login", methods=["GET", "POST"])
+@app.route("/login", methods=["GET","POST"])
 def login():
     if request.method == "POST":
         u = request.form["username"]
@@ -93,7 +92,7 @@ def login():
 
         conn = get_db()
         c = conn.cursor()
-        c.execute("SELECT * FROM users WHERE username=? AND password=?", (u, p))
+        c.execute("SELECT * FROM users WHERE username=? AND password=?", (u,p))
         user = c.fetchone()
         conn.close()
 
@@ -101,12 +100,12 @@ def login():
             session["user"] = u
             return redirect("/")
         else:
-            return "Wrong username or password"
+            return "Wrong username/password"
 
     return render_template("login.html")
 
 # ===== SIGNUP =====
-@app.route("/signup", methods=["GET", "POST"])
+@app.route("/signup", methods=["GET","POST"])
 def signup():
     if request.method == "POST":
         u = request.form["username"]
@@ -114,7 +113,7 @@ def signup():
 
         conn = get_db()
         c = conn.cursor()
-        c.execute("INSERT INTO users VALUES (NULL, ?, ?)", (u, p))
+        c.execute("INSERT INTO users VALUES (NULL, ?, ?)", (u,p))
         conn.commit()
         conn.close()
 
