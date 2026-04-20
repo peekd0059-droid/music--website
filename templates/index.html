@@ -4,12 +4,11 @@
     <title>Melofy</title>
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
-
 <body>
 
-<h1>Melofy</h1>
+<h1>🎧 Melofy</h1>
 
-<a href="/liked">❤️ Liked Songs</a>
+<a href="/liked">❤️ Liked Songs</a> |
 <a href="/logout">Logout</a>
 
 <div class="songs">
@@ -17,45 +16,22 @@
 {% for song in songs %}
 <div class="card">
 
-    <img src="{{ song.image }}" width="150">
+    <img src="/static/{{ song.img }}" width="150">
+
     <h3>{{ song.name }}</h3>
 
-    <button onclick="playSong('{{ song.file }}')">▶</button>
+    <audio controls>
+        <source src="/static/{{ song.file }}">
+    </audio>
 
-    <button onclick="likeSong('{{ song.name }}','{{ song.file }}','{{ song.image }}')">❤️</button>
+    <br>
+
+    <a href="/like/{{ song.name }}">❤️ Like</a>
 
 </div>
 {% endfor %}
 
 </div>
-
-<audio id="player" controls></audio>
-
-<script>
-function playSong(file){
-    let player = document.getElementById("player");
-    player.src = file;
-    player.play();
-}
-
-function likeSong(name,file,image){
-    fetch("/like",{
-        method:"POST",
-        headers:{
-            "Content-Type":"application/json"
-        },
-        body:JSON.stringify({
-            name:name,
-            file:file,
-            image:image
-        })
-    })
-    .then(res=>res.json())
-    .then(data=>{
-        alert("Liked ❤️");
-    })
-}
-</script>
 
 </body>
 </html>

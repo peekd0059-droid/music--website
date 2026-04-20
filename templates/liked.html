@@ -2,31 +2,18 @@
 <html>
 <head>
     <title>Liked Songs</title>
-    <link rel="stylesheet" href="/static/css/style.css">
 </head>
-
 <body>
 
-<h1>❤️ Liked Songs</h1>
+<h2>❤️ Liked Songs</h2>
 
-<div class="songs">
+<a href="/">Back</a>
 
-{% if songs %}
-    {% for song in songs %}
-    <div class="card">
-        <img src="{{ song.image }}" width="150">
-        <h3>{{ song.name }}</h3>
-
-        <audio controls>
-            <source src="{{ song.file }}">
-        </audio>
-    </div>
-    {% endfor %}
-{% else %}
-    <p>No liked songs yet</p>
-{% endif %}
-
-</div>
+<ul>
+{% for song in songs %}
+    <li>{{ song[0] }}</li>
+{% endfor %}
+</ul>
 
 </body>
 </html>

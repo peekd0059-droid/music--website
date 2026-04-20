@@ -1,16 +1,14 @@
 from flask import Flask, render_template, request, redirect, session
 import sqlite3
-import os
 
 app = Flask(__name__)
 app.secret_key = "secret123"
 
-# DB PATH (Render compatible)
-DB_PATH = "songs.db"
+DB = "songs.db"
 
 
 def get_db():
-    return sqlite3.connect(DB_PATH)
+    return sqlite3.connect(DB)
 
 
 # ===== INIT DB =====
@@ -18,11 +16,21 @@ def init_db():
     conn = get_db()
     c = conn.cursor()
 
+    # users
     c.execute("""
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         username TEXT UNIQUE,
         password TEXT
+    )
+    """)
+
+    # liked songs
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS liked (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT,
+        song TEXT
     )
     """)
 
@@ -33,12 +41,52 @@ def init_db():
 init_db()
 
 
-# ===== HOME =====
+# ===== HOME (Spotify UI) =====
 @app.route("/")
 def home():
     if "user" not in session:
         return redirect("/login")
-    return "<h1>✅ Login Successful</h1>"
+
+    songs = [
+        {"name": "DR MOB Fearless Funk", "file": "songs/DR MØB, Chris Linton - Fearless Funk.mp3", "img": "images/DR MØB, Chris Linton - Fearless Funk.jpg"},
+        {"name": "MXZI Deno Favela", "file": "songs/MXZI, Deno - FAVELA.mp3", "img": "images/MXZI, Deno - FAVELA.jpg"},
+    ]
+
+    return render_template("index.html", songs=songs)
+
+
+# ===== LIKE SONG =====
+@app.route("/like/<song>")
+def like(song):
+    if "user" not in session:
+        return redirect("/login")
+
+    conn = get_db()
+    c = conn.cursor()
+
+    c.execute("INSERT INTO liked (username, song) VALUES (?, ?)", (session["user"], song))
+
+    conn.commit()
+    conn.close()
+
+    return redirect("/")
+
+
+# ===== LIKED PAGE =====
+@app.route("/liked")
+def liked():
+    if "user" not in session:
+        return redirect("/login")
+
+    conn = get_db()
+    c = conn.cursor()
+
+    c.execute("SELECT song FROM liked WHERE username=?", (session["user"],))
+    songs = c.fetchall()
+
+    conn.close()
+
+    return render_template("liked.html", songs=songs)
 
 
 # ===== SIGNUP =====
