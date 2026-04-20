@@ -7,7 +7,6 @@
 <body>
 
 <h1>🎧 Melofy</h1>
-
 <a href="/logout">Logout</a>
 
 <div class="songs">
@@ -18,13 +17,24 @@
 
     <h3>{{ song.name }}</h3>
 
-    <audio controls>
-        <source src="/static/{{ song.file }}">
-    </audio>
+    <button onclick="playSong('{{ song.file }}')">▶ Play</button>
 
 </div>
 {% endfor %}
 </div>
+
+<!-- SINGLE PLAYER -->
+<div class="player">
+    <audio id="player" controls></audio>
+</div>
+
+<script>
+function playSong(file){
+    let player = document.getElementById("player");
+    player.src = "/static/" + file;
+    player.play();
+}
+</script>
 
 </body>
 </html>
