@@ -3,6 +3,7 @@ import sqlite3
 conn = sqlite3.connect("song.db")
 c = conn.cursor()
 
+# likes table
 c.execute("""
 CREATE TABLE IF NOT EXISTS likes (
 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -11,6 +12,7 @@ song_id INTEGER
 )
 """)
 
+# playlists table
 c.execute("""
 CREATE TABLE IF NOT EXISTS playlists (
 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -22,4 +24,4 @@ name TEXT
 conn.commit()
 conn.close()
 
-print("DB UPDATED")
+print("DB READY")

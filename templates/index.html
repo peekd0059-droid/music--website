@@ -43,11 +43,11 @@
 <br><br>
 
 <a href="/like/{{song[0]}}" class="btn">
-    {% if song[0] in liked_ids %}
-        ❤️
-    {% else %}
-        🤍
-    {% endif %}
+{% if liked_ids and song[0] in liked_ids %}
+❤️
+{% else %}
+🤍
+{% endif %}
 </a>
 
 </div>
