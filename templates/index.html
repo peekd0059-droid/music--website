@@ -1,47 +1,98 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
 <title>Melofy</title>
 
 <style>
-body{background:#0a0a0f;color:white;font-family:sans-serif}
-.header{display:flex;justify-content:space-between;align-items:center;padding:20px}
-.search input{padding:8px;border-radius:5px;border:none}
-.songs{display:flex;gap:20px;padding:20px}
-.card{background:#111;padding:15px;border-radius:10px;width:200px}
-.card img{width:100%;height:150px;object-fit:cover}
-.player{position:fixed;bottom:0;width:100%;background:#111;padding:10px}
-.btn{color:#1db954;text-decoration:none}
+body{background:#0a0a0f;color:white;margin:0;font-family:sans-serif}
+
+.header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:20px 40px;
+}
+
+.search input{
+padding:10px;
+border-radius:20px;
+border:none;
+width:250px;
+}
+
+.songs{
+display:flex;
+gap:25px;
+padding:20px 40px;
+flex-wrap:wrap;
+}
+
+.card{
+background:#111;
+padding:15px;
+border-radius:15px;
+width:200px;
+transition:0.3s;
+}
+
+.card:hover{
+transform:scale(1.05);
+background:#181818;
+}
+
+.card img{
+width:100%;
+height:150px;
+object-fit:cover;
+border-radius:10px;
+}
+
+button{
+background:#1db954;
+border:none;
+padding:8px 15px;
+border-radius:20px;
+cursor:pointer;
+}
+
+.btn{
+color:#1db954;
+text-decoration:none;
+}
+
+.player{
+position:fixed;
+bottom:0;
+width:100%;
+background:#111;
+padding:15px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
 </style>
+
 </head>
 
 <body>
 
-<!-- HEADER -->
 <div class="header">
 <h2>🎧 Melofy</h2>
 
-<div class="search">
-<form action="/search">
+<form action="/search" class="search">
 <input type="text" name="q" placeholder="Search songs">
 </form>
-</div>
 
-<div>
 <a href="/liked" class="btn">❤️ Liked</a>
 </div>
-</div>
 
-<!-- PLAYLIST -->
-<div style="padding:20px">
+<div style="padding:20px 40px">
 <form action="/create_playlist" method="POST">
 <input name="name" placeholder="Create playlist">
 <button>Create</button>
 </form>
 </div>
 
-<!-- SONGS -->
 <div class="songs">
 
 {% for song in songs %}
@@ -64,59 +115,57 @@ body{background:#0a0a0f;color:white;font-family:sans-serif}
 
 </div>
 
-<!-- PLAYER -->
 <div class="player">
 <p id="title">Select song</p>
 
+<div>
 <button onclick="prevSong()">⏮</button>
 <button onclick="togglePlay()">⏯</button>
 <button onclick="nextSong()">⏭</button>
+</div>
 
-<audio id="audio" style="width:100%"></audio>
+<audio id="audio" style="width:50%"></audio>
 </div>
 
 <script>
+let audio=document.getElementById("audio");
+let isPlaying=false;
+let songs=[];
+let currentIndex=0;
 
-let audio = document.getElementById("audio");
-let isPlaying = false;
-let songs = [];
-let currentIndex = 0;
-
-// collect songs
-document.querySelectorAll(".card").forEach((card, i)=>{
-    let file = card.querySelector("button").getAttribute("onclick").split("'")[1];
-    let title = card.querySelector("h4").innerText;
-    songs.push({file,title});
+document.querySelectorAll(".card").forEach((card,i)=>{
+let file=card.querySelector("button").getAttribute("onclick").split("'")[1];
+let title=card.querySelector("h4").innerText;
+songs.push({file,title});
 });
 
 function playSong(file,title){
-    audio.src="/static/"+file;
-    audio.play();
-    isPlaying=true;
-    document.getElementById("title").innerText=title;
-    currentIndex = songs.findIndex(s=>s.file===file);
+audio.src="/static/"+file;
+audio.play();
+isPlaying=true;
+document.getElementById("title").innerText=title;
+currentIndex=songs.findIndex(s=>s.file===file);
 }
 
 function togglePlay(){
-    if(!audio.src) return;
-    if(isPlaying){audio.pause();isPlaying=false;}
-    else{audio.play();isPlaying=true;}
+if(!audio.src) return;
+if(isPlaying){audio.pause();isPlaying=false;}
+else{audio.play();isPlaying=true;}
 }
 
 function nextSong(){
-    currentIndex=(currentIndex+1)%songs.length;
-    let s=songs[currentIndex];
-    playSong(s.file,s.title);
+currentIndex=(currentIndex+1)%songs.length;
+let s=songs[currentIndex];
+playSong(s.file,s.title);
 }
 
 function prevSong(){
-    currentIndex=(currentIndex-1+songs.length)%songs.length;
-    let s=songs[currentIndex];
-    playSong(s.file,s.title);
+currentIndex=(currentIndex-1+songs.length)%songs.length;
+let s=songs[currentIndex];
+playSong(s.file,s.title);
 }
 
 audio.addEventListener("ended",nextSong);
-
 </script>
 
 </body>
