@@ -9,64 +9,62 @@ def get_db():
     conn.row_factory = sqlite3.Row
     return conn
 
-# ================= DATABASE =================
-conn = get_db()
-c = conn.cursor()
+# ===== DATABASE INIT =====
+def init_db():
+    conn = get_db()
+    c = conn.cursor()
 
-# Songs
-c.execute("""
-CREATE TABLE IF NOT EXISTS songs (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT,
-    file TEXT,
-    image TEXT
-)
-""")
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS songs (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT,
+        file TEXT,
+        image TEXT
+    )
+    """)
 
-# Users
-c.execute("""
-CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT,
-    password TEXT
-)
-""")
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT,
+        password TEXT
+    )
+    """)
 
-# ❤️ User-wise liked songs
-c.execute("""
-CREATE TABLE IF NOT EXISTS liked_songs (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user TEXT,
-    name TEXT,
-    file TEXT,
-    image TEXT
-)
-""")
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS liked_songs (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user TEXT,
+        name TEXT,
+        file TEXT,
+        image TEXT
+    )
+    """)
 
-# Playlist
-c.execute("""
-CREATE TABLE IF NOT EXISTS playlists (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user TEXT,
-    name TEXT
-)
-""")
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS playlists (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user TEXT,
+        name TEXT
+    )
+    """)
 
-# Playlist songs
-c.execute("""
-CREATE TABLE IF NOT EXISTS playlist_songs (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    playlist_id INTEGER,
-    name TEXT,
-    file TEXT,
-    image TEXT
-)
-""")
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS playlist_songs (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        playlist_id INTEGER,
+        name TEXT,
+        file TEXT,
+        image TEXT
+    )
+    """)
 
-conn.commit()
-conn.close()
+    conn.commit()
+    conn.close()
 
-# ================= HOME =================
+init_db()
+
+# ===== HOME =====
 @app.route("/")
 def home():
     if "user" not in session:
@@ -75,8 +73,11 @@ def home():
     conn = get_db()
     c = conn.cursor()
 
-    c.execute("SELECT * FROM songs")
-    data = c.fetchall()
+    try:
+        c.execute("SELECT * FROM songs")
+        data = c.fetchall()
+    except:
+        data = []
 
     songs = []
     for row in data:
@@ -89,7 +90,7 @@ def home():
     conn.close()
     return render_template("index.html", songs=songs)
 
-# ================= SIGNUP =================
+# ===== SIGNUP =====
 @app.route("/signup", methods=["GET","POST"])
 def signup():
     if request.method == "POST":
@@ -107,7 +108,7 @@ def signup():
 
     return render_template("signup.html")
 
-# ================= LOGIN =================
+# ===== LOGIN =====
 @app.route("/login", methods=["GET","POST"])
 def login():
     if request.method == "POST":
@@ -130,13 +131,13 @@ def login():
 
     return render_template("login.html")
 
-# ================= LOGOUT =================
+# ===== LOGOUT =====
 @app.route("/logout")
 def logout():
     session.pop("user", None)
     return redirect("/login")
 
-# ================= ❤️ LIKE =================
+# ===== LIKE =====
 @app.route("/like", methods=["POST"])
 def like_song():
     if "user" not in session:
@@ -157,7 +158,7 @@ def like_song():
 
     return jsonify({"status":"ok"})
 
-# ================= ❤️ LIKED PAGE =================
+# ===== LIKED PAGE =====
 @app.route("/liked")
 def liked():
     if "user" not in session:
@@ -166,8 +167,11 @@ def liked():
     conn = get_db()
     c = conn.cursor()
 
-    c.execute("SELECT * FROM liked_songs WHERE user=?", (session["user"],))
-    data = c.fetchall()
+    try:
+        c.execute("SELECT * FROM liked_songs WHERE user=?", (session["user"],))
+        data = c.fetchall()
+    except:
+        data = []
 
     songs = []
     for row in data:
@@ -180,54 +184,6 @@ def liked():
     conn.close()
     return render_template("liked.html", songs=songs)
 
-# ================= 📂 CREATE PLAYLIST =================
-@app.route("/create_playlist", methods=["POST"])
-def create_playlist():
-    name = request.form["name"]
-
-    conn = get_db()
-    c = conn.cursor()
-
-    c.execute("INSERT INTO playlists (user, name) VALUES (?, ?)", (session["user"], name))
-    conn.commit()
-    conn.close()
-
-    return redirect("/")
-
-# ================= ➕ ADD TO PLAYLIST =================
-@app.route("/add_to_playlist", methods=["POST"])
-def add_to_playlist():
-    data = request.get_json()
-
-    conn = get_db()
-    c = conn.cursor()
-
-    c.execute("""
-    INSERT INTO playlist_songs (playlist_id, name, file, image)
-    VALUES (?, ?, ?, ?)
-    """, (data["playlist_id"], data["name"], data["file"], data["image"]))
-
-    conn.commit()
-    conn.close()
-
-    return "OK"
-
-# ================= VIEW PLAYLIST =================
-@app.route("/playlist/<int:id>")
-def view_playlist(id):
-    conn = get_db()
-    c = conn.cursor()
-
-    c.execute("SELECT name FROM playlists WHERE id=?", (id,))
-    playlist = c.fetchone()
-
-    c.execute("SELECT name, file, image FROM playlist_songs WHERE playlist_id=?", (id,))
-    songs = c.fetchall()
-
-    conn.close()
-
-    return render_template("playlist.html", playlist=playlist, songs=songs)
-
-# ================= RUN =================
+# ===== RUN =====
 if __name__ == "__main__":
     app.run(debug=True)
