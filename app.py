@@ -3,11 +3,15 @@ import sqlite3
 
 app = Flask(__name__)
 
-# Database connection
-conn = sqlite3.connect("songs.db", check_same_thread=False)
-cursor = conn.cursor()
+def get_db():
+    conn = sqlite3.connect("songs.db")
+    conn.row_factory = sqlite3.Row
+    return conn
 
 # Create tables
+conn = get_db()
+cursor = conn.cursor()
+
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS songs (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -27,40 +31,46 @@ CREATE TABLE IF NOT EXISTS liked_songs (
 """)
 
 conn.commit()
+conn.close()
 
 
-# Home route
+# Home
 @app.route("/")
 def home():
+    conn = get_db()
+    cursor = conn.cursor()
+
     cursor.execute("SELECT * FROM songs")
     data = cursor.fetchall()
 
     songs = []
     for row in data:
         songs.append({
-            "name": row[1],
-            "file": row[2],
-            "image": row[3]
+            "name": row["name"],
+            "file": row["file"],
+            "image": row["image"]
         })
 
+    conn.close()
     return render_template("index.html", songs=songs)
 
 
-# ❤️ Like route (FIXED)
+# ❤️ Like
 @app.route("/like", methods=["POST"])
 def like_song():
     try:
         data = request.get_json()
 
-        name = data.get("name")
-        file = data.get("file")
-        image = data.get("image")
+        conn = get_db()
+        cursor = conn.cursor()
 
         cursor.execute(
             "INSERT INTO liked_songs (name, file, image) VALUES (?, ?, ?)",
-            (name, file, image)
+            (data["name"], data["file"], data["image"])
         )
+
         conn.commit()
+        conn.close()
 
         return jsonify({"status": "success"})
 
@@ -72,18 +82,23 @@ def like_song():
 # ❤️ Liked page
 @app.route("/liked")
 def liked():
+    conn = get_db()
+    cursor = conn.cursor()
+
     cursor.execute("SELECT * FROM liked_songs")
     data = cursor.fetchall()
 
     songs = []
     for row in data:
         songs.append({
-            "name": row[1],
-            "file": row[2],
-            "image": row[3]
+            "name": row["name"],
+            "file": row["file"],
+            "image": row["image"]
         })
 
+    conn.close()
     return render_template("liked.html", songs=songs)
+
 
 if __name__ == "__main__":
     app.run(debug=True)
