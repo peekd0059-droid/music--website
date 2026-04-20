@@ -2,7 +2,6 @@
 <html>
 <head>
 <title>Melofy</title>
-
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 
@@ -10,20 +9,22 @@
 
 <!-- HEADER -->
 <div class="header">
-<h2>🎧 Melofy</h2>
+    <h2>🎧 Melofy</h2>
 
-<form action="/search" class="search">
-<input type="text" name="q" placeholder="Search songs">
-</form>
+    <form action="/search" class="search">
+        <input type="text" name="q" placeholder="Search songs">
+    </form>
 
-<div>
-<a href="/liked" class="btn">❤️ Liked</a>
-<a href="/playlist" class="btn">📂 Playlist</a>
+    <div>
+        <a href="/liked" class="btn">❤️</a>
+        <a href="/playlist" class="btn">📂</a>
+        <a href="/login" class="btn">Login</a>
+        <a href="/logout" class="btn">Logout</a>
+    </div>
 </div>
-</div>
 
-<!-- PLAYLIST CREATE -->
-<div style="padding:20px 40px">
+<!-- CREATE PLAYLIST -->
+<div style="padding:20px">
 <form action="/create_playlist" method="POST">
 <input name="name" placeholder="Create playlist">
 <button>Create</button>
@@ -46,7 +47,7 @@
 
 <br><br>
 
-<!-- ❤️ LIKE -->
+<!-- LIKE -->
 <a href="/like/{{song[0]}}" class="btn">
 {% if liked_ids and song[0] in liked_ids %}
 ❤️
@@ -57,7 +58,7 @@
 
 <br><br>
 
-<!-- 🎵 ADD TO PLAYLIST -->
+<!-- ADD TO PLAYLIST -->
 <form action="/add_to_playlist/{{song[0]}}" method="POST">
 <select name="playlist_id">
 {% for p in playlists %}
@@ -74,7 +75,6 @@
 
 <!-- PLAYER -->
 <div class="player">
-
 <p id="title">Select song</p>
 
 <div>
@@ -83,11 +83,9 @@
 <button onclick="nextSong()">⏭</button>
 </div>
 
-<audio id="audio" controls style="width:50%"></audio>
-
+<audio id="audio" controls style="width:90%"></audio>
 </div>
 
-<!-- SCRIPT -->
 <script>
 let audio=document.getElementById("audio");
 let isPlaying=false;

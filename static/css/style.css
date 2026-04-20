@@ -5,27 +5,34 @@ margin:0;
 font-family:sans-serif;
 }
 
+/* HEADER */
 .header{
 display:flex;
 justify-content:space-between;
 align-items:center;
-padding:20px 40px;
+padding:20px;
+flex-wrap:wrap;
 }
 
+/* SEARCH */
 .search input{
 padding:10px;
 border-radius:20px;
 border:none;
 width:250px;
+max-width:100%;
 }
 
+/* SONG GRID */
 .songs{
 display:flex;
-gap:25px;
-padding:20px 40px;
+gap:20px;
+padding:20px;
 flex-wrap:wrap;
+justify-content:center;
 }
 
+/* CARD */
 .card{
 background:#111;
 padding:15px;
@@ -39,6 +46,7 @@ transform:scale(1.05);
 background:#181818;
 }
 
+/* IMAGE */
 .card img{
 width:100%;
 height:150px;
@@ -46,6 +54,7 @@ object-fit:cover;
 border-radius:10px;
 }
 
+/* BUTTON */
 button{
 background:#1db954;
 border:none;
@@ -58,16 +67,34 @@ color:white;
 .btn{
 color:#1db954;
 text-decoration:none;
-margin-left:10px;
 }
 
+/* PLAYER */
 .player{
 position:fixed;
 bottom:0;
 width:100%;
 background:#111;
-padding:15px;
+padding:10px;
 display:flex;
-justify-content:space-between;
+flex-direction:column;
 align-items:center;
+}
+
+/* MOBILE RESPONSIVE */
+@media(max-width:600px){
+
+.card{
+width:90%;
+}
+
+.search input{
+width:100%;
+}
+
+.header{
+flex-direction:column;
+gap:10px;
+}
+
 }
