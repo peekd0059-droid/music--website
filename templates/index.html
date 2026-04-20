@@ -124,8 +124,9 @@
             <button onclick="playSong({{ loop.index0 }})">▶ Play</button>
 
             <!-- ❤️ Like Button -->
-            <button onclick="likeSong('{{ song['name'] }}','{{ song['file'] }}','{{ song['image'] }}')" 
-            style="background:none; border:none;">
+            <button 
+            onclick="likeSong(this,'{{ song['name'] }}','{{ song['file'] }}','{{ song['image'] }}')" 
+            style="background:none; border:none; font-size:18px;">
             ❤️
             </button>
 
@@ -223,8 +224,9 @@ function searchSongs(){
     }
 }
 
-// ❤️ Like
-function likeSong(name, file, image){
+// ❤️ Like + Color change
+function likeSong(btn, name, file, image){
+
     fetch("/like", {
         method: "POST",
         headers: {
@@ -236,7 +238,10 @@ function likeSong(name, file, image){
             image: image
         })
     }).then(() => {
-        alert("❤️ Added to Liked Songs");
+
+        btn.style.color = "#1db954";
+        btn.innerText = "💚";
+
     });
 }
 
