@@ -9,60 +9,16 @@ def get_db():
     conn.row_factory = sqlite3.Row
     return conn
 
-# ===== DATABASE INIT =====
-def init_db():
-    conn = get_db()
-    c = conn.cursor()
+# ===== INIT DB =====
+conn = get_db()
+c = conn.cursor()
 
-    c.execute("""
-    CREATE TABLE IF NOT EXISTS songs (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT,
-        file TEXT,
-        image TEXT
-    )
-    """)
+c.execute("CREATE TABLE IF NOT EXISTS songs (id INTEGER PRIMARY KEY, name TEXT, file TEXT, image TEXT)")
+c.execute("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, username TEXT, password TEXT)")
+c.execute("CREATE TABLE IF NOT EXISTS liked_songs (id INTEGER PRIMARY KEY, user TEXT, name TEXT, file TEXT, image TEXT)")
 
-    c.execute("""
-    CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT,
-        password TEXT
-    )
-    """)
-
-    c.execute("""
-    CREATE TABLE IF NOT EXISTS liked_songs (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user TEXT,
-        name TEXT,
-        file TEXT,
-        image TEXT
-    )
-    """)
-
-    c.execute("""
-    CREATE TABLE IF NOT EXISTS playlists (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user TEXT,
-        name TEXT
-    )
-    """)
-
-    c.execute("""
-    CREATE TABLE IF NOT EXISTS playlist_songs (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        playlist_id INTEGER,
-        name TEXT,
-        file TEXT,
-        image TEXT
-    )
-    """)
-
-    conn.commit()
-    conn.close()
-
-init_db()
+conn.commit()
+conn.close()
 
 # ===== HOME =====
 @app.route("/")
@@ -73,11 +29,8 @@ def home():
     conn = get_db()
     c = conn.cursor()
 
-    try:
-        c.execute("SELECT * FROM songs")
-        data = c.fetchall()
-    except:
-        data = []
+    c.execute("SELECT * FROM songs")
+    data = c.fetchall()
 
     songs = []
     for row in data:
@@ -99,8 +52,7 @@ def signup():
 
         conn = get_db()
         c = conn.cursor()
-
-        c.execute("INSERT INTO users (username, password) VALUES (?, ?)", (username, password))
+        c.execute("INSERT INTO users (username, password) VALUES (?,?)",(username,password))
         conn.commit()
         conn.close()
 
@@ -118,7 +70,7 @@ def login():
         conn = get_db()
         c = conn.cursor()
 
-        c.execute("SELECT * FROM users WHERE username=? AND password=?", (username, password))
+        c.execute("SELECT * FROM users WHERE username=? AND password=?", (username,password))
         user = c.fetchone()
 
         conn.close()
@@ -148,10 +100,8 @@ def like_song():
     conn = get_db()
     c = conn.cursor()
 
-    c.execute("""
-    INSERT INTO liked_songs (user, name, file, image)
-    VALUES (?, ?, ?, ?)
-    """, (session["user"], data["name"], data["file"], data["image"]))
+    c.execute("INSERT INTO liked_songs (user,name,file,image) VALUES (?,?,?,?)",
+              (session["user"], data["name"], data["file"], data["image"]))
 
     conn.commit()
     conn.close()
@@ -167,11 +117,8 @@ def liked():
     conn = get_db()
     c = conn.cursor()
 
-    try:
-        c.execute("SELECT * FROM liked_songs WHERE user=?", (session["user"],))
-        data = c.fetchall()
-    except:
-        data = []
+    c.execute("SELECT * FROM liked_songs WHERE user=?", (session["user"],))
+    data = c.fetchall()
 
     songs = []
     for row in data:
