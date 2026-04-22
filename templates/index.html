@@ -7,26 +7,36 @@
 
 <body>
 
+<!-- NAVBAR -->
 <div class="navbar">
     <h1>🎧 Melofy</h1>
 
-    <form action="/create_playlist" method="POST">
-        <input type="text" name="name" placeholder="New Playlist">
-        <button>Create</button>
-    </form>
+    <div class="nav-right">
+        <form action="/create_playlist" method="POST">
+            <input type="text" name="name" placeholder="New Playlist">
+            <button>Create</button>
+        </form>
+    </div>
 </div>
 
-<!-- PLAYLIST -->
+<!-- PLAYLIST SECTION -->
 <div style="padding:20px;">
-<h3>📂 Playlists</h3>
+    <h2>📂 Playlists</h2>
 
-{% for p in playlists %}
-    <a href="/playlist/{{p['id']}}">{{p['name']}}</a><br>
-{% endfor %}
+    {% if playlists %}
+        {% for p in playlists %}
+            <div>
+                <a href="/playlist/{{p['id']}}">👉 {{p['name']}}</a>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No playlist yet 😢</p>
+    {% endif %}
 </div>
 
 <hr>
 
+<!-- SONGS -->
 <div class="songs-container">
 
 {% for song in songs %}
@@ -42,6 +52,7 @@
     </button>
 
     <!-- ADD TO PLAYLIST -->
+    {% if playlists %}
     <form action="/add_to_playlist/{{song['id']}}" method="POST">
         <select name="playlist_id">
             {% for p in playlists %}
@@ -50,6 +61,9 @@
         </select>
         <button>Add</button>
     </form>
+    {% else %}
+        <p style="color:gray;">Create playlist first</p>
+    {% endif %}
 
 </div>
 
@@ -64,6 +78,7 @@
 </div>
 
 <script>
+
 let songs = [
 {% for song in songs %}
 {
@@ -82,6 +97,7 @@ function playSong(index){
 
     title.innerText = songs[index].name;
 }
+
 </script>
 
 </body>
