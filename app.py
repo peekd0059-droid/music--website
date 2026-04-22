@@ -1,49 +1,103 @@
+from flask import Flask, render_template, request, redirect, session
+import sqlite3
+import hashlib
+
+app = Flask(__name__)
+app.secret_key = "secret123"
+
+# DB
+def get_db():
+    conn = sqlite3.connect("song.db")
+    conn.row_factory = sqlite3.Row
+    return conn
+
+# HASH
+def hash_password(p):
+    return hashlib.sha256(p.encode()).hexdigest()
+
+# INIT DB
+def init_db():
+    conn = get_db()
+    c = conn.cursor()
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT UNIQUE,
+        password TEXT
+    )
+    """)
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS songs (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT,
+        file TEXT,
+        image TEXT,
+        plays INTEGER DEFAULT 0
+    )
+    """)
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS likes (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT,
+        song_id INTEGER
+    )
+    """)
+
+    conn.commit()
+    conn.close()
+
+init_db()
+
+# ================= HOME =================
+@app.route('/')
+def home():
+    conn = get_db()
+    songs = conn.execute("SELECT * FROM songs").fetchall()
+    conn.close()
+    return render_template("index.html", songs=songs, liked_ids=[])
 
 # ================= TRENDING =================
 @app.route('/trending')
 def trending():
     conn = get_db()
-    songs = conn.execute(
-        "SELECT * FROM songs ORDER BY plays DESC LIMIT 10"
-    ).fetchall()
+    songs = conn.execute("SELECT * FROM songs ORDER BY plays DESC LIMIT 10").fetchall()
     conn.close()
-
     return render_template("index.html", songs=songs, liked_ids=[])
 
-
-# ================= SIMPLE AI RECOMMEND =================
+# ================= RECOMMEND =================
 @app.route('/recommend')
 def recommend():
-    user = session.get("user", "")
-
     conn = get_db()
 
-    liked = conn.execute(
-        "SELECT song_id FROM likes WHERE username=?",
-        (user,)
-    ).fetchall()
+    # SAFE QUERY (no crash)
+    songs = conn.execute("SELECT * FROM songs ORDER BY RANDOM() LIMIT 5").fetchall()
 
-    liked_ids = [str(i["song_id"]) for i in liked]
+    conn.close()
+    return render_template("index.html", songs=songs, liked_ids=[])
 
-    if liked_ids:
-        query = f"""
-        SELECT * FROM songs 
-        WHERE id NOT IN ({','.join(liked_ids)})
-        ORDER BY RANDOM() LIMIT 5
-        """
-    else:
-        query = "SELECT * FROM songs ORDER BY RANDOM() LIMIT 5"
+# ================= LIKE =================
+@app.route('/like/<int:id>')
+def like(id):
+    conn = get_db()
+    conn.execute("INSERT INTO likes(username, song_id) VALUES (?,?)", ("guest", id))
+    conn.commit()
+    conn.close()
+    return redirect('/')
 
-    songs = conn.execute(query).fetchall()
+# ================= SEARCH =================
+@app.route('/search')
+def search():
+    q = request.args.get("q")
+
+    conn = get_db()
+    songs = conn.execute("SELECT * FROM songs WHERE name LIKE ?",('%'+q+'%',)).fetchall()
     conn.close()
 
     return render_template("index.html", songs=songs, liked_ids=[])
 
-
-# ================= API (FUTURE REACT READY) =================
-@app.route('/api/songs')
-def api_songs():
-    conn = get_db()
-    songs = [dict(row) for row in conn.execute("SELECT * FROM songs")]
-    conn.close()
-    return {"songs": songs}
+# ================= RUN =================
+if __name__ == "__main__":
+    app.run(debug=True)
