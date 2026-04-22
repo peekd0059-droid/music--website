@@ -7,30 +7,28 @@
 
 <body>
 
-<h1>🎧 Melofy</h1>
+<div class="navbar">
+    <h1>🎧 Melofy</h1>
 
-<a href="/logout">Logout</a>
+    <div class="nav-right">
+        <a href="/logout">Logout</a>
 
-<br><br>
+        <form action="/search" class="search-box">
+            <input type="text" name="q" placeholder="Search songs">
+            <button>Search</button>
+        </form>
 
-<form action="/search">
-    <input type="text" name="q" placeholder="Search songs">
-    <button>Search</button>
-</form>
+        <a href="/upload">Upload Song</a>
+    </div>
+</div>
 
-<br>
-
-<a href="/upload">Upload Song</a>
-
-<hr>
-
-<div style="display:flex;gap:20px;flex-wrap:wrap;">
+<div class="songs-container">
 
 {% for song in songs %}
 
-<div style="background:#111;padding:20px;border-radius:10px;width:200px">
+<div class="card">
 
-    <img src="{{ song['image'] }}" width="150">
+    <img src="{{ song['image'] }}" class="cover">
 
     <h3>{{ song['name'] }}</h3>
 
@@ -38,17 +36,15 @@
         <source src="{{ song['file'] }}">
     </audio>
 
-    <br>
+    <div class="actions">
+        <a href="/play/{{song['id']}}">▶ Play</a>
 
-    <a href="/play/{{song['id']}}">▶ Play</a>
-
-    <br><br>
-
-    {% if song['id'] in liked_ids %}
-        <a href="/like/{{song['id']}}">❤️ Liked</a>
-    {% else %}
-        <a href="/like/{{song['id']}}">🤍 Like</a>
-    {% endif %}
+        {% if song['id'] in liked_ids %}
+            <a href="/like/{{song['id']}}">❤️ Liked</a>
+        {% else %}
+            <a href="/like/{{song['id']}}">🤍 Like</a>
+        {% endif %}
+    </div>
 
 </div>
 
