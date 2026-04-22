@@ -1,7 +1,6 @@
-from flask import Flask, render_template, request, redirect, session, jsonify
+from flask import Flask, render_template, request, redirect, session
 import sqlite3
 import hashlib
-import os
 
 app = Flask(__name__)
 app.secret_key = "secret123"
@@ -65,7 +64,7 @@ def signup():
             conn.execute("INSERT INTO users(username,password) VALUES (?,?)",(u,p))
             conn.commit()
         except:
-            return "User already exists"
+            return "User exists"
 
         conn.close()
         return redirect('/login')
@@ -99,7 +98,6 @@ def logout():
 @app.route('/')
 def home():
     conn = get_db()
-
     songs = conn.execute("SELECT * FROM songs").fetchall()
 
     user = session.get("user", "")
@@ -129,16 +127,6 @@ def like(id):
     conn.close()
 
     return redirect('/')
-
-# ================= PLAY =================
-
-@app.route('/play/<int:id>')
-def play(id):
-    conn = get_db()
-    conn.execute("UPDATE songs SET plays = plays + 1 WHERE id=?",(id,))
-    conn.commit()
-    conn.close()
-    return ""
 
 # ================= SEARCH =================
 

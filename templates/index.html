@@ -28,22 +28,16 @@
 
 <div class="card">
 
-    <img src="{{ song['image'] }}" class="cover">
+    <img src="/{{ song['image'] }}" class="cover">
 
     <h3>{{ song['name'] }}</h3>
 
     <audio controls>
-        <source src="{{ song['file'] }}">
+        <source src="/{{ song['file'] }}">
     </audio>
 
     <div class="actions">
-        <a href="/play/{{song['id']}}">▶ Play</a>
-
-        {% if song['id'] in liked_ids %}
-            <a href="/like/{{song['id']}}">❤️ Liked</a>
-        {% else %}
-            <a href="/like/{{song['id']}}">🤍 Like</a>
-        {% endif %}
+        <a href="/like/{{song['id']}}">❤️ Like</a>
     </div>
 
 </div>

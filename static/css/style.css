@@ -10,7 +10,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 30px;
+    padding: 15px 40px;
 }
 
 .nav-right {
@@ -33,12 +33,13 @@ body {
     border: none;
 }
 
-/* SONG GRID */
+/* GRID CENTER FIX */
 .songs-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 25px;
-    padding: 20px 30px;
+    justify-content: center;
+    gap: 30px;
+    padding: 40px;
 }
 
 /* CARD */
@@ -52,6 +53,7 @@ body {
 
 .card:hover {
     transform: scale(1.05);
+    box-shadow: 0 0 20px #1db954;
 }
 
 /* IMAGE */
@@ -60,6 +62,7 @@ body {
     height: 150px;
     object-fit: cover;
     border-radius: 10px;
+    background: #222;
 }
 
 /* AUDIO */
@@ -68,13 +71,7 @@ audio {
     margin-top: 10px;
 }
 
-/* ACTIONS */
-.actions {
-    margin-top: 10px;
-    display: flex;
-    justify-content: space-between;
-}
-
+/* LINKS */
 a {
     color: #1db954;
     text-decoration: none;
