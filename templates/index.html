@@ -7,6 +7,9 @@
 
 <body>
 
+<!-- LOADER -->
+<div id="loader">Loading...</div>
+
 <!-- HEADER -->
 <div class="header">
     <h2>🎧 Melofy</h2>
@@ -43,11 +46,12 @@
 
 <h4>{{song[1]}}</h4>
 
-<button onclick="playSong('{{song[2]}}','{{song[1]}}')">▶ Play</button>
+<button onclick="playSong('{{song[2]}}','{{song[1]}}'); this.innerText='Playing...'">
+▶ Play
+</button>
 
 <br><br>
 
-<!-- LIKE -->
 <a href="/like/{{song[0]}}" class="btn">
 {% if liked_ids and song[0] in liked_ids %}
 ❤️
@@ -58,7 +62,6 @@
 
 <br><br>
 
-<!-- ADD TO PLAYLIST -->
 <form action="/add_to_playlist/{{song[0]}}" method="POST">
 <select name="playlist_id">
 {% for p in playlists %}
@@ -87,6 +90,10 @@
 </div>
 
 <script>
+window.onload = function(){
+document.getElementById("loader").style.display="none";
+}
+
 let audio=document.getElementById("audio");
 let isPlaying=false;
 let songs=[];
