@@ -8,14 +8,14 @@
 <body>
 
 <!-- LOADER -->
-<div id="loader">Loading Melofy...</div>
+<div id="loader">Loading...</div>
 
 <!-- SIDEBAR -->
 <div class="sidebar">
 <h2>🎧 Melofy</h2>
 
 <a href="/">🏠 Home</a>
-<a href="/playlist">📂 Playlist</a>
+<a href="/trending">🔥 Trending</a>
 <a href="/liked">❤️ Liked</a>
 <a href="/login">🔐 Login</a>
 <a href="/logout">🚪 Logout</a>
@@ -36,13 +36,25 @@
 {% for song in songs %}
 <div class="card">
 
-<img src="{{song[3]}}">
+<img src="{{song[3]}}" onerror="this.src='https://via.placeholder.com/150'">
 
 <h4>{{song[1]}}</h4>
 
-<button onclick="playSong('{{song[2]}}','{{song[1]}}')">
+<!-- PLAY + TRACK -->
+<button onclick="playSong('{{song[2]}}','{{song[1]}}'); fetch('/play/{{song[0]}}')">
 ▶ Play
 </button>
+
+<br><br>
+
+<!-- LIKE -->
+<a href="/like/{{song[0]}}" class="btn">
+{% if liked_ids and song[0] in liked_ids %}
+❤️
+{% else %}
+🤍
+{% endif %}
+</a>
 
 </div>
 {% endfor %}
