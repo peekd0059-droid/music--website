@@ -1,28 +1,34 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Melofy</title>
+<title>Melofy Pro</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 
 <body>
 
 <!-- LOADER -->
-<div id="loader">Loading...</div>
+<div id="loader">Loading Melofy...</div>
 
-<!-- HEADER -->
-<div class="header">
-    <h2>🎧 Melofy</h2>
+<!-- SIDEBAR -->
+<div class="sidebar">
+<h2>🎧 Melofy</h2>
 
-    <form action="/search" class="search">
-        <input type="text" name="q" placeholder="Search songs">
-    </form>
+<a href="/">🏠 Home</a>
+<a href="/playlist">📂 Playlist</a>
+<a href="/liked">❤️ Liked</a>
+<a href="/login">🔐 Login</a>
+<a href="/logout">🚪 Logout</a>
 
-    <div>
-        <a href="/login" class="btn">Login</a>
-        <a href="/logout" class="btn">Logout</a>
-    </div>
 </div>
+
+<!-- MAIN -->
+<div class="main">
+
+<!-- SEARCH -->
+<form action="/search" class="search">
+<input type="text" name="q" placeholder="Search songs...">
+</form>
 
 <!-- SONGS -->
 <div class="songs">
@@ -30,13 +36,11 @@
 {% for song in songs %}
 <div class="card">
 
-{% if song[3] %}
 <img src="{{song[3]}}">
-{% endif %}
 
 <h4>{{song[1]}}</h4>
 
-<button onclick="playSong('{{song[2]}}','{{song[1]}}'); this.innerText='Playing...'">
+<button onclick="playSong('{{song[2]}}','{{song[1]}}')">
 ▶ Play
 </button>
 
@@ -45,63 +49,86 @@
 
 </div>
 
+</div>
+
 <!-- PLAYER -->
 <div class="player">
-<p id="title">Select song</p>
 
-<div>
+<p id="title">🎵 Select a song</p>
+
+<div class="controls">
 <button onclick="prevSong()">⏮</button>
 <button onclick="togglePlay()">⏯</button>
 <button onclick="nextSong()">⏭</button>
 </div>
 
-<audio id="audio" controls style="width:90%"></audio>
+<input type="range" id="progress" value="0">
+
+<audio id="audio"></audio>
+
 </div>
 
 <script>
-window.onload = function(){
-document.getElementById("loader").style.display="none";
-}
+
+// LOADER
+window.onload = ()=> document.getElementById("loader").style.display="none";
 
 let audio=document.getElementById("audio");
-let isPlaying=false;
 let songs=[];
 let currentIndex=0;
+let isPlaying=false;
 
-// IMPORTANT: cloud URL use
-document.querySelectorAll(".card").forEach((card,i)=>{
+// LOAD SONGS
+document.querySelectorAll(".card").forEach((card)=>{
 let file=card.querySelector("button").getAttribute("onclick").split("'")[1];
 let title=card.querySelector("h4").innerText;
 songs.push({file,title});
 });
 
+// PLAY
 function playSong(file,title){
-audio.src=file;   // 🔥 cloud fix
+audio.src=file;
 audio.play();
 isPlaying=true;
 document.getElementById("title").innerText=title;
 currentIndex=songs.findIndex(s=>s.file===file);
 }
 
+// TOGGLE
 function togglePlay(){
 if(!audio.src) return;
 if(isPlaying){audio.pause();isPlaying=false;}
 else{audio.play();isPlaying=true;}
 }
 
+// NEXT
 function nextSong(){
 currentIndex=(currentIndex+1)%songs.length;
 let s=songs[currentIndex];
 playSong(s.file,s.title);
 }
 
+// PREV
 function prevSong(){
 currentIndex=(currentIndex-1+songs.length)%songs.length;
 let s=songs[currentIndex];
 playSong(s.file,s.title);
 }
 
+// PROGRESS BAR
+audio.addEventListener("timeupdate",()=>{
+let progress=document.getElementById("progress");
+progress.value=(audio.currentTime/audio.duration)*100;
+});
+
+// SEEK
+document.getElementById("progress").addEventListener("input",(e)=>{
+audio.currentTime=(e.target.value/100)*audio.duration;
+});
+
+// AUTO NEXT
 audio.addEventListener("ended",nextSong);
+
 </script>
 
 </body>
