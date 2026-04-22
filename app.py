@@ -1,18 +1,14 @@
-from flask import Flask, render_template, request, redirect, session
+from flask import Flask, render_template, request, redirect
 import sqlite3
-import hashlib
 
 app = Flask(__name__)
-app.secret_key = "secret123"
 
 def get_db():
     conn = sqlite3.connect("song.db")
     conn.row_factory = sqlite3.Row
     return conn
 
-def hash_password(p):
-    return hashlib.sha256(p.encode()).hexdigest()
-
+# INIT DB
 def init_db():
     conn = get_db()
     c = conn.cursor()
@@ -22,8 +18,7 @@ def init_db():
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT,
         file TEXT,
-        image TEXT,
-        plays INTEGER DEFAULT 0
+        image TEXT
     )
     """)
 
@@ -47,13 +42,23 @@ def init_db():
 
 init_db()
 
+# GET PLAYLISTS
+def get_playlists():
+    conn = get_db()
+    playlists = conn.execute("SELECT * FROM playlists").fetchall()
+    conn.close()
+    return playlists
+
 # HOME
 @app.route('/')
 def home():
     conn = get_db()
     songs = conn.execute("SELECT * FROM songs").fetchall()
     conn.close()
-    return render_template("index.html", songs=songs)
+
+    playlists = get_playlists()   # ✅ IMPORTANT FIX
+
+    return render_template("index.html", songs=songs, playlists=playlists)
 
 # CREATE PLAYLIST
 @app.route('/create_playlist', methods=["POST"])
@@ -93,16 +98,11 @@ def view_playlist(id):
     WHERE playlist_songs.playlist_id = ?
     """, (id,)).fetchall()
 
+    playlists = get_playlists()   # ✅ IMPORTANT
+
     conn.close()
 
-    return render_template("index.html", songs=songs)
-
-# GET PLAYLISTS
-def get_playlists():
-    conn = get_db()
-    playlists = conn.execute("SELECT * FROM playlists").fetchall()
-    conn.close()
-    return playlists
+    return render_template("index.html", songs=songs, playlists=playlists)
 
 # RUN
 if __name__ == "__main__":

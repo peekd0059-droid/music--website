@@ -14,14 +14,13 @@
         <input type="text" name="name" placeholder="New Playlist">
         <button>Create</button>
     </form>
-
 </div>
 
-<!-- PLAYLIST LIST -->
+<!-- PLAYLIST -->
 <div style="padding:20px;">
 <h3>📂 Playlists</h3>
 
-{% for p in get_playlists() %}
+{% for p in playlists %}
     <a href="/playlist/{{p['id']}}">{{p['name']}}</a><br>
 {% endfor %}
 </div>
@@ -45,7 +44,7 @@
     <!-- ADD TO PLAYLIST -->
     <form action="/add_to_playlist/{{song['id']}}" method="POST">
         <select name="playlist_id">
-            {% for p in get_playlists() %}
+            {% for p in playlists %}
                 <option value="{{p['id']}}">{{p['name']}}</option>
             {% endfor %}
         </select>
@@ -65,7 +64,6 @@
 </div>
 
 <script>
-
 let songs = [
 {% for song in songs %}
 {
@@ -84,7 +82,6 @@ function playSong(index){
 
     title.innerText = songs[index].name;
 }
-
 </script>
 
 </body>
