@@ -48,7 +48,7 @@
 <br><br>
 
 <!-- LIKE -->
-<a href="/like/{{song[0]}}" class="btn">
+<a href="#" onclick="likeSong({{song[0]}})">❤️</a>
 {% if liked_ids and song[0] in liked_ids %}
 ❤️
 {% else %}
@@ -141,7 +141,16 @@ audio.currentTime=(e.target.value/100)*audio.duration;
 // AUTO NEXT
 audio.addEventListener("ended",nextSong);
 
+<script>
+function likeSong(id){
+fetch("/api/like/"+id,{method:"POST"})
+.then(res=>res.json())
+.then(data=>{
+location.reload();
+});
+}
 </script>
+
 
 </body>
 </html>
