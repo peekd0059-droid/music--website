@@ -32,7 +32,7 @@
 
     <h3>{{ song['name'] }}</h3>
 
-    <button onclick="playSong('{{song['file']}}', {{song['id']}}, '{{song['name']}}')" class="play-btn">
+    <button onclick="playSong({{loop.index0}})" class="play-btn">
         ▶ Play
     </button>
 
@@ -47,22 +47,62 @@
 <!-- PLAYER -->
 <div class="player">
     <p id="nowPlaying">No song selected</p>
+
+    <button onclick="prevSong()">⏮</button>
+    <button onclick="nextSong()">⏭</button>
+
     <audio id="audioPlayer" controls></audio>
 </div>
 
 <script>
-function playSong(file, id, name){
+
+let songs = [
+{% for song in songs %}
+{
+    file: "{{song['file']}}",
+    name: "{{song['name']}}",
+    id: {{song['id']}}
+},
+{% endfor %}
+];
+
+let currentIndex = 0;
+
+function playSong(index){
+    currentIndex = index;
+
     let player = document.getElementById("audioPlayer");
     let title = document.getElementById("nowPlaying");
 
-    player.src = "/" + file;
+    player.src = "/" + songs[index].file;
     player.play();
 
-    title.innerText = name;
+    title.innerText = songs[index].name;
 
-    // play count update
-    fetch("/play/" + id);
+    fetch("/play/" + songs[index].id);
 }
+
+function nextSong(){
+    currentIndex++;
+    if(currentIndex >= songs.length){
+        currentIndex = 0;
+    }
+    playSong(currentIndex);
+}
+
+function prevSong(){
+    currentIndex--;
+    if(currentIndex < 0){
+        currentIndex = songs.length - 1;
+    }
+    playSong(currentIndex);
+}
+
+// 🔥 AUTO PLAY NEXT
+document.getElementById("audioPlayer").addEventListener("ended", function(){
+    nextSong();
+});
+
 </script>
 
 </body>
