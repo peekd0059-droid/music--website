@@ -1,156 +1,60 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Melofy Pro</title>
-<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Melofy</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 
 <body>
 
-<!-- LOADER -->
-<div id="loader">Loading...</div>
+<h1>🎧 Melofy</h1>
 
-<!-- SIDEBAR -->
-<div class="sidebar">
-<h2>🎧 Melofy</h2>
-
-<a href="/">🏠 Home</a>
-<a href="/trending">🔥 Trending</a>
-<a href="/liked">❤️ Liked</a>
-<a href="/login">🔐 Login</a>
-<a href="/logout">🚪 Logout</a>
-
-</div>
-
-<!-- MAIN -->
-<div class="main">
-
-<!-- SEARCH -->
-<form action="/search" class="search">
-<input type="text" name="q" placeholder="Search songs...">
-</form>
-
-<!-- SONGS -->
-<div class="songs">
-
-{% for song in songs %}
-<div class="card">
-
-<img src="{{song[3]}}" onerror="this.src='https://via.placeholder.com/150'">
-
-<h4>{{song[1]}}</h4>
-
-<!-- PLAY + TRACK -->
-<button onclick="playSong('{{song[2]}}','{{song[1]}}'); fetch('/play/{{song[0]}}')">
-▶ Play
-</button>
+<a href="/logout">Logout</a>
 
 <br><br>
 
-<!-- LIKE -->
-<a href="#" onclick="likeSong({{song[0]}})">❤️</a>
-{% if liked_ids and song[0] in liked_ids %}
-❤️
-{% else %}
-🤍
-{% endif %}
-</a>
+<form action="/search">
+    <input type="text" name="q" placeholder="Search songs">
+    <button>Search</button>
+</form>
+
+<br>
+
+<a href="/upload">Upload Song</a>
+
+<hr>
+
+<div style="display:flex;gap:20px;flex-wrap:wrap;">
+
+{% for song in songs %}
+
+<div style="background:#111;padding:20px;border-radius:10px;width:200px">
+
+    <img src="{{ song['image'] }}" width="150">
+
+    <h3>{{ song['name'] }}</h3>
+
+    <audio controls>
+        <source src="{{ song['file'] }}">
+    </audio>
+
+    <br>
+
+    <a href="/play/{{song['id']}}">▶ Play</a>
+
+    <br><br>
+
+    {% if song['id'] in liked_ids %}
+        <a href="/like/{{song['id']}}">❤️ Liked</a>
+    {% else %}
+        <a href="/like/{{song['id']}}">🤍 Like</a>
+    {% endif %}
 
 </div>
+
 {% endfor %}
 
 </div>
-
-</div>
-
-<!-- PLAYER -->
-<div class="player">
-
-<p id="title">🎵 Select a song</p>
-
-<div class="controls">
-<button onclick="prevSong()">⏮</button>
-<button onclick="togglePlay()">⏯</button>
-<button onclick="nextSong()">⏭</button>
-</div>
-
-<input type="range" id="progress" value="0">
-
-<audio id="audio"></audio>
-
-</div>
-
-<script>
-
-// LOADER
-window.onload = ()=> document.getElementById("loader").style.display="none";
-
-let audio=document.getElementById("audio");
-let songs=[];
-let currentIndex=0;
-let isPlaying=false;
-
-// LOAD SONGS
-document.querySelectorAll(".card").forEach((card)=>{
-let file=card.querySelector("button").getAttribute("onclick").split("'")[1];
-let title=card.querySelector("h4").innerText;
-songs.push({file,title});
-});
-
-// PLAY
-function playSong(file,title){
-audio.src=file;
-audio.play();
-isPlaying=true;
-document.getElementById("title").innerText=title;
-currentIndex=songs.findIndex(s=>s.file===file);
-}
-
-// TOGGLE
-function togglePlay(){
-if(!audio.src) return;
-if(isPlaying){audio.pause();isPlaying=false;}
-else{audio.play();isPlaying=true;}
-}
-
-// NEXT
-function nextSong(){
-currentIndex=(currentIndex+1)%songs.length;
-let s=songs[currentIndex];
-playSong(s.file,s.title);
-}
-
-// PREV
-function prevSong(){
-currentIndex=(currentIndex-1+songs.length)%songs.length;
-let s=songs[currentIndex];
-playSong(s.file,s.title);
-}
-
-// PROGRESS BAR
-audio.addEventListener("timeupdate",()=>{
-let progress=document.getElementById("progress");
-progress.value=(audio.currentTime/audio.duration)*100;
-});
-
-// SEEK
-document.getElementById("progress").addEventListener("input",(e)=>{
-audio.currentTime=(e.target.value/100)*audio.duration;
-});
-
-// AUTO NEXT
-audio.addEventListener("ended",nextSong);
-
-<script>
-function likeSong(id){
-fetch("/api/like/"+id,{method:"POST"})
-.then(res=>res.json())
-.then(data=>{
-location.reload();
-});
-}
-</script>
-
 
 </body>
 </html>
