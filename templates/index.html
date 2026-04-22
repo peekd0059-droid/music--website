@@ -19,19 +19,9 @@
     </form>
 
     <div>
-        <a href="/liked" class="btn">❤️</a>
-        <a href="/playlist" class="btn">📂</a>
         <a href="/login" class="btn">Login</a>
         <a href="/logout" class="btn">Logout</a>
     </div>
-</div>
-
-<!-- CREATE PLAYLIST -->
-<div style="padding:20px">
-<form action="/create_playlist" method="POST">
-<input name="name" placeholder="Create playlist">
-<button>Create</button>
-</form>
 </div>
 
 <!-- SONGS -->
@@ -41,7 +31,7 @@
 <div class="card">
 
 {% if song[3] %}
-<img src="{{ url_for('static', filename=song[3]) }}">
+<img src="{{song[3]}}">
 {% endif %}
 
 <h4>{{song[1]}}</h4>
@@ -49,27 +39,6 @@
 <button onclick="playSong('{{song[2]}}','{{song[1]}}'); this.innerText='Playing...'">
 ▶ Play
 </button>
-
-<br><br>
-
-<a href="/like/{{song[0]}}" class="btn">
-{% if liked_ids and song[0] in liked_ids %}
-❤️
-{% else %}
-🤍
-{% endif %}
-</a>
-
-<br><br>
-
-<form action="/add_to_playlist/{{song[0]}}" method="POST">
-<select name="playlist_id">
-{% for p in playlists %}
-<option value="{{p[0]}}">{{p[2]}}</option>
-{% endfor %}
-</select>
-<button>Add</button>
-</form>
 
 </div>
 {% endfor %}
@@ -99,6 +68,7 @@ let isPlaying=false;
 let songs=[];
 let currentIndex=0;
 
+// IMPORTANT: cloud URL use
 document.querySelectorAll(".card").forEach((card,i)=>{
 let file=card.querySelector("button").getAttribute("onclick").split("'")[1];
 let title=card.querySelector("h4").innerText;
@@ -106,7 +76,7 @@ songs.push({file,title});
 });
 
 function playSong(file,title){
-audio.src="/static/"+file;
+audio.src=file;   // 🔥 cloud fix
 audio.play();
 isPlaying=true;
 document.getElementById("title").innerText=title;
