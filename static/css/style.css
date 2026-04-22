@@ -13,10 +13,9 @@ body {
     padding: 15px 40px;
 }
 
-.nav-right {
-    display: flex;
-    align-items: center;
-    gap: 15px;
+.nav-right a {
+    color: #1db954;
+    margin-right: 10px;
 }
 
 .search-box input {
