@@ -10,17 +10,23 @@
 <div class="navbar">
     <h1>🎧 Melofy</h1>
 
-    <div class="nav-right">
-        <a href="/">Home</a>
-        <a href="/trending">🔥 Trending</a>
-        <a href="/recommend">🤖 For You</a>
+    <form action="/create_playlist" method="POST">
+        <input type="text" name="name" placeholder="New Playlist">
+        <button>Create</button>
+    </form>
 
-        <form action="/search" class="search-box">
-            <input type="text" name="q" placeholder="Search songs">
-            <button>Search</button>
-        </form>
-    </div>
 </div>
+
+<!-- PLAYLIST LIST -->
+<div style="padding:20px;">
+<h3>📂 Playlists</h3>
+
+{% for p in get_playlists() %}
+    <a href="/playlist/{{p['id']}}">{{p['name']}}</a><br>
+{% endfor %}
+</div>
+
+<hr>
 
 <div class="songs-container">
 
@@ -36,7 +42,15 @@
         ▶ Play
     </button>
 
-    <a href="/like/{{song['id']}}">❤️ Like</a>
+    <!-- ADD TO PLAYLIST -->
+    <form action="/add_to_playlist/{{song['id']}}" method="POST">
+        <select name="playlist_id">
+            {% for p in get_playlists() %}
+                <option value="{{p['id']}}">{{p['name']}}</option>
+            {% endfor %}
+        </select>
+        <button>Add</button>
+    </form>
 
 </div>
 
@@ -46,11 +60,7 @@
 
 <!-- PLAYER -->
 <div class="player">
-    <p id="nowPlaying">No song selected</p>
-
-    <button onclick="prevSong()">⏮</button>
-    <button onclick="nextSong()">⏭</button>
-
+    <p id="nowPlaying">No song</p>
     <audio id="audioPlayer" controls></audio>
 </div>
 
@@ -60,17 +70,12 @@ let songs = [
 {% for song in songs %}
 {
     file: "{{song['file']}}",
-    name: "{{song['name']}}",
-    id: {{song['id']}}
+    name: "{{song['name']}}"
 },
 {% endfor %}
 ];
 
-let currentIndex = 0;
-
 function playSong(index){
-    currentIndex = index;
-
     let player = document.getElementById("audioPlayer");
     let title = document.getElementById("nowPlaying");
 
@@ -78,30 +83,7 @@ function playSong(index){
     player.play();
 
     title.innerText = songs[index].name;
-
-    fetch("/play/" + songs[index].id);
 }
-
-function nextSong(){
-    currentIndex++;
-    if(currentIndex >= songs.length){
-        currentIndex = 0;
-    }
-    playSong(currentIndex);
-}
-
-function prevSong(){
-    currentIndex--;
-    if(currentIndex < 0){
-        currentIndex = songs.length - 1;
-    }
-    playSong(currentIndex);
-}
-
-// 🔥 AUTO PLAY NEXT
-document.getElementById("audioPlayer").addEventListener("ended", function(){
-    nextSong();
-});
 
 </script>
 
