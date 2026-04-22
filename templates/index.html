@@ -2,24 +2,23 @@
 <html>
 <head>
     <title>Melofy</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
+
 <body>
 
 <div class="navbar">
     <h1>🎧 Melofy</h1>
 
     <div class="nav-right">
-<a href="/trending">🔥 Trending</a>
-<a href="/recommend">🤖 For You</a>
-<a href="/logout">Logout</a>
+        <a href="/">Home</a>
+        <a href="/trending">🔥 Trending</a>
+        <a href="/recommend">🤖 For You</a>
 
         <form action="/search" class="search-box">
             <input type="text" name="q" placeholder="Search songs">
             <button>Search</button>
         </form>
-
-        <a href="/upload">Upload Song</a>
     </div>
 </div>
 
@@ -33,7 +32,7 @@
 
     <h3>{{ song['name'] }}</h3>
 
-    <button onclick="playSong('{{song['file']}}','{{song['name']}}')" class="play-btn">
+    <button onclick="playSong('{{song['file']}}', {{song['id']}}, '{{song['name']}}')" class="play-btn">
         ▶ Play
     </button>
 
@@ -45,15 +44,14 @@
 
 </div>
 
-<!-- 🎧 PLAYER -->
+<!-- PLAYER -->
 <div class="player">
     <p id="nowPlaying">No song selected</p>
-
     <audio id="audioPlayer" controls></audio>
 </div>
 
 <script>
-function playSong(file, name){
+function playSong(file, id, name){
     let player = document.getElementById("audioPlayer");
     let title = document.getElementById("nowPlaying");
 
@@ -61,6 +59,9 @@ function playSong(file, name){
     player.play();
 
     title.innerText = name;
+
+    // play count update
+    fetch("/play/" + id);
 }
 </script>
 
