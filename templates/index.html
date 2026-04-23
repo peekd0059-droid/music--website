@@ -1,24 +1,21 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Upload Song</title>
+    <title>Bulk Upload</title>
 </head>
 <body>
 
-<h2>Upload Song</h2>
+<h2>🎵 Upload Multiple Songs</h2>
 
 <form action="/upload" method="POST" enctype="multipart/form-data">
-    
-    <input type="text" name="name" placeholder="Song Name" required>
-    <br><br>
 
-    <input type="file" name="song" required>
-    <br><br>
+    <label>Common Image:</label><br>
+    <input type="file" name="image" required><br><br>
 
-    <input type="file" name="image" required>
-    <br><br>
+    <label>Select Songs:</label><br>
+    <input type="file" name="songs" multiple required><br><br>
 
-    <button>Upload</button>
+    <button>Upload All</button>
 
 </form>
 

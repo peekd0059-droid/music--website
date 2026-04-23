@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect
 import sqlite3
+import os
 
 app = Flask(__name__)
 
@@ -38,7 +39,6 @@ def init_db():
     )
     """)
 
-    # ❤️ LIKE TABLE
     c.execute("""
     CREATE TABLE IF NOT EXISTS likes (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -51,7 +51,7 @@ def init_db():
 
 init_db()
 
-# ================= GET PLAYLISTS =================
+# ================= PLAYLIST =================
 def get_playlists():
     conn = get_db()
     playlists = conn.execute("SELECT * FROM playlists").fetchall()
@@ -62,7 +62,6 @@ def get_playlists():
 @app.route('/')
 def home():
     conn = get_db()
-
     songs = conn.execute("SELECT * FROM songs").fetchall()
     liked = conn.execute("SELECT song_id FROM likes").fetchall()
 
@@ -74,6 +73,45 @@ def home():
                            songs=songs,
                            playlists=get_playlists(),
                            liked_ids=liked_ids)
+
+# ================= BULK UPLOAD =================
+@app.route('/upload', methods=["GET", "POST"])
+def upload():
+    if request.method == "POST":
+
+        image = request.files["image"]
+        songs = request.files.getlist("songs")
+
+        # ensure folders
+        os.makedirs("static/songs", exist_ok=True)
+        os.makedirs("static/images", exist_ok=True)
+
+        # save image once
+        image_path = "static/images/" + image.filename
+        image.save(image_path)
+
+        conn = get_db()
+
+        for song in songs:
+            if song.filename == "":
+                continue
+
+            song_path = "static/songs/" + song.filename
+            song.save(song_path)
+
+            name = os.path.splitext(song.filename)[0]
+
+            conn.execute(
+                "INSERT INTO songs(name,file,image) VALUES (?,?,?)",
+                (name, song_path, image_path)
+            )
+
+        conn.commit()
+        conn.close()
+
+        return redirect('/')
+
+    return render_template("upload.html")
 
 # ================= LIKE =================
 @app.route('/like/<int:song_id>')
@@ -110,36 +148,6 @@ def liked():
                            songs=songs,
                            playlists=get_playlists(),
                            liked_ids=[s["id"] for s in songs])
-
-
-@app.route('/upload', methods=["GET","POST"])
-def upload():
-    if request.method == "POST":
-        name = request.form["name"]
-        song = request.files["song"]
-        image = request.files["image"]
-
-        song_path = "static/songs/" + song.filename
-        image_path = "static/images/" + image.filename
-
-        song.save(song_path)
-        image.save(image_path)
-
-        conn = get_db()
-        conn.execute(
-            "INSERT INTO songs(name,file,image) VALUES (?,?,?)",
-            (name, song_path, image_path)
-        )
-        conn.commit()
-        conn.close()
-
-        return redirect('/')
-
-    return render_template("upload.html")
-
-
-
-
 
 # ================= RUN =================
 if __name__ == "__main__":
