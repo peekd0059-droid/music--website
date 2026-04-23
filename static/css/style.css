@@ -200,3 +200,17 @@ a {
         font-size: 12px;
     }
 }
+
+.mood-section {
+    text-align: center;
+    padding: 20px;
+}
+
+.mood-section a {
+    margin: 5px;
+    padding: 10px 15px;
+    background: #1db954;
+    color: white;
+    border-radius: 20px;
+    text-decoration: none;
+}

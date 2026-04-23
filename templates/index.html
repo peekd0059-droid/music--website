@@ -19,70 +19,22 @@
     </div>
 </div>
 
-<!-- PLAYLIST -->
-<div style="padding:20px;">
-    <h2>📂 Playlists</h2>
-
-    {% if playlists %}
-        {% for p in playlists %}
-            <div>
-                <a href="/playlist/{{p['id']}}">👉 {{p['name']}}</a>
-            </div>
-        {% endfor %}
-    {% else %}
-        <p>No playlist yet 😢</p>
-    {% endif %}
+<!-- 🎯 MOOD BUTTONS -->
+<div class="mood-section">
+    <h2>🎯 Choose Mood</h2>
+    <a href="/mood?type=happy">😊 Happy</a>
+    <a href="/mood?type=sad">😢 Sad</a>
+    <a href="/mood?type=chill">🌙 Chill</a>
+    <a href="/mood?type=energy">⚡ Energy</a>
 </div>
 
-<hr>
+<!-- PLAYLIST -->
+<div style="padding:20px;">
+<h2>📂 Playlists</h2>
 
-<!-- 🚀 FEATURES TABLE -->
-<div class="features">
-
-    <h2>🚀 Unique Features (Future Vision)</h2>
-
-    <table>
-        <tr>
-            <th>Feature</th>
-            <th>Problem Solve Hogi</th>
-        </tr>
-
-        <tr>
-            <td>🎯 Mood-based playlist</td>
-            <td>Algorithm bubble</td>
-        </tr>
-
-        <tr>
-            <td>👥 Real-time friend activity</td>
-            <td>Social features</td>
-        </tr>
-
-        <tr>
-            <td>🔍 Lyrics search</td>
-            <td>Weak search</td>
-        </tr>
-
-        <tr>
-            <td>🌐 Hindi/Regional UI</td>
-            <td>Language barrier</td>
-        </tr>
-
-        <tr>
-            <td>📂 Smart playlist folders</td>
-            <td>Poor organization</td>
-        </tr>
-
-        <tr>
-            <td>🎵 Ad-free experience</td>
-            <td>Ads problem</td>
-        </tr>
-
-        <tr>
-            <td>🤝 Live collaborative listening</td>
-            <td>Social isolation</td>
-        </tr>
-
-    </table>
+{% for p in playlists %}
+    <a href="/playlist/{{p['id']}}">{{p['name']}}</a><br>
+{% endfor %}
 
 </div>
 
@@ -103,8 +55,6 @@
         ▶ Play
     </button>
 
-    <!-- ADD TO PLAYLIST -->
-    {% if playlists %}
     <form action="/add_to_playlist/{{song['id']}}" method="POST">
         <select name="playlist_id">
             {% for p in playlists %}
@@ -113,9 +63,6 @@
         </select>
         <button>Add</button>
     </form>
-    {% else %}
-        <p style="color:gray;">Create playlist first</p>
-    {% endif %}
 
 </div>
 
@@ -153,4 +100,4 @@ function playSong(index){
 </script>
 
 </body>
-</html>>
+</html>
