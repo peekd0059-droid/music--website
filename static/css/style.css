@@ -154,3 +154,49 @@ a {
         flex-direction: column;
     }
 }
+
+
+/* FEATURES SECTION */
+.features {
+    padding: 40px;
+    color: white;
+}
+
+.features h2 {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* TABLE */
+.features table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #111;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+/* HEADER */
+.features th {
+    background: #1db954;
+    padding: 12px;
+    text-align: left;
+}
+
+/* ROW */
+.features td {
+    padding: 12px;
+    border-bottom: 1px solid #333;
+}
+
+/* HOVER EFFECT */
+.features tr:hover {
+    background: #222;
+}
+
+/* MOBILE */
+@media (max-width: 600px) {
+    .features table {
+        font-size: 12px;
+    }
+}
