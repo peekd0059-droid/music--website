@@ -23,6 +23,31 @@
 <div class="mood-section">
     <h2>🎯 Choose Mood</h2>
     <a href="/mood?type=happy">😊 Happy</a>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Melofy</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<div class="navbar">
+    <h1>🎧 Melofy</h1>
+
+    <div class="nav-right">
+        <form action="/create_playlist" method="POST">
+            <input type="text" name="name" placeholder="New Playlist">
+            <button>Create</button>
+        </form>
+    </div>
+</div>
+
+<!-- 🎯 MOOD SECTION -->
+<div class="mood-section">
+    <h2>🎯 Choose Mood</h2>
+    <a href="/mood?type=happy">😊 Happy</a>
     <a href="/mood?type=sad">😢 Sad</a>
     <a href="/mood?type=chill">🌙 Chill</a>
     <a href="/mood?type=energy">⚡ Energy</a>
@@ -30,12 +55,17 @@
 
 <!-- PLAYLIST -->
 <div style="padding:20px;">
-<h2>📂 Playlists</h2>
+    <h2>📂 Playlists</h2>
 
-{% for p in playlists %}
-    <a href="/playlist/{{p['id']}}">{{p['name']}}</a><br>
-{% endfor %}
-
+    {% if playlists %}
+        {% for p in playlists %}
+            <div>
+                <a href="/playlist/{{p['id']}}">👉 {{p['name']}}</a>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No playlist yet 😢</p>
+    {% endif %}
 </div>
 
 <hr>
@@ -55,6 +85,8 @@
         ▶ Play
     </button>
 
+    <!-- ADD TO PLAYLIST -->
+    {% if playlists %}
     <form action="/add_to_playlist/{{song['id']}}" method="POST">
         <select name="playlist_id">
             {% for p in playlists %}
@@ -63,6 +95,9 @@
         </select>
         <button>Add</button>
     </form>
+    {% else %}
+        <p style="color:gray;">Create playlist first</p>
+    {% endif %}
 
 </div>
 
