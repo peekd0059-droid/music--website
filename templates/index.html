@@ -1,116 +1,26 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Melofy</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Upload Song</title>
 </head>
-
 <body>
 
-<!-- NAVBAR -->
-<div class="navbar">
-    <h1>🎧 Melofy</h1>
+<h2>Upload Song</h2>
 
-    <div class="nav-right">
-        <a href="/liked">❤️ Liked</a>
+<form action="/upload" method="POST" enctype="multipart/form-data">
+    
+    <input type="text" name="name" placeholder="Song Name" required>
+    <br><br>
 
-        <form action="/create_playlist" method="POST">
-            <input type="text" name="name" placeholder="New Playlist">
-            <button>Create</button>
-        </form>
-    </div>
-</div>
+    <input type="file" name="song" required>
+    <br><br>
 
-<!-- 🎯 MOOD SECTION -->
-<div class="mood-section">
-    <h2>🎯 Choose Mood</h2>
-    <a href="/mood?type=happy">😊 Happy</a>
-    <a href="/mood?type=sad">😢 Sad</a>
-    <a href="/mood?type=chill">🌙 Chill</a>
-    <a href="/mood?type=energy">⚡ Energy</a>
-</div>
+    <input type="file" name="image" required>
+    <br><br>
 
-<!-- PLAYLIST -->
-<div class="playlist-section">
-    <h2>📂 Playlists</h2>
+    <button>Upload</button>
 
-    {% if playlists %}
-        {% for p in playlists %}
-            <a href="/playlist/{{p['id']}}">👉 {{p['name']}}</a>
-        {% endfor %}
-    {% else %}
-        <p>No playlist yet</p>
-    {% endif %}
-</div>
-
-<hr>
-
-<!-- SONGS -->
-<div class="songs-container">
-
-{% for song in songs %}
-
-<div class="card">
-
-    <img src="/{{ song['image'] }}" class="cover">
-
-    <h3>{{ song['name'] }}</h3>
-
-    <button onclick="playSong({{loop.index0}})" class="play-btn">
-        ▶ Play
-    </button>
-
-    <!-- ❤️ LIKE -->
-    {% if song['id'] in liked_ids %}
-        <a href="/like/{{song['id']}}">💔 Unlike</a>
-    {% else %}
-        <a href="/like/{{song['id']}}">❤️ Like</a>
-    {% endif %}
-
-    <!-- ➕ ADD TO PLAYLIST -->
-    {% if playlists %}
-    <form action="/add_to_playlist/{{song['id']}}" method="POST">
-        <select name="playlist_id">
-            {% for p in playlists %}
-                <option value="{{p['id']}}">{{p['name']}}</option>
-            {% endfor %}
-        </select>
-        <button>Add</button>
-    </form>
-    {% endif %}
-
-</div>
-
-{% endfor %}
-
-</div>
-
-<!-- PLAYER -->
-<div class="player">
-    <p id="nowPlaying">No song</p>
-    <audio id="audioPlayer" controls></audio>
-</div>
-
-<script>
-let songs = [
-{% for song in songs %}
-{
-    file: "{{song['file']}}",
-    name: "{{song['name']}}"
-},
-{% endfor %}
-];
-
-function playSong(index){
-    let player = document.getElementById("audioPlayer");
-    let title = document.getElementById("nowPlaying");
-
-    player.src = "/" + songs[index].file;
-    player.play();
-
-    title.innerText = songs[index].name;
-}
-</script>
+</form>
 
 </body>
 </html>

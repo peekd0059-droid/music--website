@@ -111,6 +111,36 @@ def liked():
                            playlists=get_playlists(),
                            liked_ids=[s["id"] for s in songs])
 
+
+@app.route('/upload', methods=["GET","POST"])
+def upload():
+    if request.method == "POST":
+        name = request.form["name"]
+        song = request.files["song"]
+        image = request.files["image"]
+
+        song_path = "static/songs/" + song.filename
+        image_path = "static/images/" + image.filename
+
+        song.save(song_path)
+        image.save(image_path)
+
+        conn = get_db()
+        conn.execute(
+            "INSERT INTO songs(name,file,image) VALUES (?,?,?)",
+            (name, song_path, image_path)
+        )
+        conn.commit()
+        conn.close()
+
+        return redirect('/')
+
+    return render_template("upload.html")
+
+
+
+
+
 # ================= RUN =================
 if __name__ == "__main__":
     app.run(debug=True)
