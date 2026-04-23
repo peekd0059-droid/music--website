@@ -4,13 +4,13 @@ import os
 
 app = Flask(__name__)
 
-# ================= DB =================
+# ===== DB =====
 def get_db():
     conn = sqlite3.connect("song.db")
     conn.row_factory = sqlite3.Row
     return conn
 
-# ================= INIT =================
+# ===== INIT =====
 def init_db():
     conn = get_db()
     c = conn.cursor()
@@ -21,21 +21,6 @@ def init_db():
         name TEXT,
         file TEXT,
         image TEXT
-    )
-    """)
-
-    c.execute("""
-    CREATE TABLE IF NOT EXISTS playlists (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT
-    )
-    """)
-
-    c.execute("""
-    CREATE TABLE IF NOT EXISTS playlist_songs (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        playlist_id INTEGER,
-        song_id INTEGER
     )
     """)
 
@@ -51,14 +36,7 @@ def init_db():
 
 init_db()
 
-# ================= PLAYLIST =================
-def get_playlists():
-    conn = get_db()
-    playlists = conn.execute("SELECT * FROM playlists").fetchall()
-    conn.close()
-    return playlists
-
-# ================= HOME =================
+# ===== HOME =====
 @app.route('/')
 def home():
     conn = get_db()
@@ -71,24 +49,26 @@ def home():
 
     return render_template("index.html",
                            songs=songs,
-                           playlists=get_playlists(),
                            liked_ids=liked_ids)
 
-# ================= BULK UPLOAD =================
+# ===== UPLOAD (FIXED) =====
 @app.route('/upload', methods=["GET", "POST"])
 def upload():
+
     if request.method == "POST":
 
-        image = request.files["image"]
+        image = request.files.get("image")
         songs = request.files.getlist("songs")
 
-        # ensure folders
+        # folders ensure
         os.makedirs("static/songs", exist_ok=True)
         os.makedirs("static/images", exist_ok=True)
 
-        # save image once
-        image_path = "static/images/" + image.filename
-        image.save(image_path)
+        # save image
+        image_path = ""
+        if image and image.filename != "":
+            image_path = "static/images/" + image.filename
+            image.save(image_path)
 
         conn = get_db()
 
@@ -109,11 +89,13 @@ def upload():
         conn.commit()
         conn.close()
 
+        # ✅ IMPORTANT FIX
         return redirect('/')
 
+    # GET request → upload page show
     return render_template("upload.html")
 
-# ================= LIKE =================
+# ===== LIKE =====
 @app.route('/like/<int:song_id>')
 def like(song_id):
     conn = get_db()
@@ -132,23 +114,6 @@ def like(song_id):
 
     return redirect('/')
 
-# ================= LIKED PAGE =================
-@app.route('/liked')
-def liked():
-    conn = get_db()
-
-    songs = conn.execute("""
-    SELECT songs.* FROM songs
-    JOIN likes ON songs.id = likes.song_id
-    """).fetchall()
-
-    conn.close()
-
-    return render_template("index.html",
-                           songs=songs,
-                           playlists=get_playlists(),
-                           liked_ids=[s["id"] for s in songs])
-
-# ================= RUN =================
+# ===== RUN =====
 if __name__ == "__main__":
     app.run(debug=True)
