@@ -14,7 +14,6 @@ def init_db():
     conn = get_db()
     c = conn.cursor()
 
-    # songs
     c.execute("""
     CREATE TABLE IF NOT EXISTS songs (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -24,7 +23,6 @@ def init_db():
     )
     """)
 
-    # playlists
     c.execute("""
     CREATE TABLE IF NOT EXISTS playlists (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -32,7 +30,6 @@ def init_db():
     )
     """)
 
-    # playlist songs
     c.execute("""
     CREATE TABLE IF NOT EXISTS playlist_songs (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -41,12 +38,11 @@ def init_db():
     )
     """)
 
-    # moods
+    # ❤️ LIKE TABLE
     c.execute("""
-    CREATE TABLE IF NOT EXISTS moods (
+    CREATE TABLE IF NOT EXISTS likes (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        song_id INTEGER,
-        mood TEXT
+        song_id INTEGER
     )
     """)
 
@@ -66,69 +62,54 @@ def get_playlists():
 @app.route('/')
 def home():
     conn = get_db()
+
     songs = conn.execute("SELECT * FROM songs").fetchall()
+    liked = conn.execute("SELECT song_id FROM likes").fetchall()
+
+    liked_ids = [l["song_id"] for l in liked]
+
     conn.close()
 
-    return render_template("index.html", songs=songs, playlists=get_playlists())
+    return render_template("index.html",
+                           songs=songs,
+                           playlists=get_playlists(),
+                           liked_ids=liked_ids)
 
-# ================= CREATE PLAYLIST =================
-@app.route('/create_playlist', methods=["POST"])
-def create_playlist():
-    name = request.form["name"]
-
+# ================= LIKE =================
+@app.route('/like/<int:song_id>')
+def like(song_id):
     conn = get_db()
-    conn.execute("INSERT INTO playlists(name) VALUES (?)", (name,))
+
+    exist = conn.execute(
+        "SELECT * FROM likes WHERE song_id=?", (song_id,)
+    ).fetchone()
+
+    if exist:
+        conn.execute("DELETE FROM likes WHERE song_id=?", (song_id,))
+    else:
+        conn.execute("INSERT INTO likes(song_id) VALUES (?)", (song_id,))
+
     conn.commit()
     conn.close()
 
     return redirect('/')
 
-# ================= ADD SONG =================
-@app.route('/add_to_playlist/<int:song_id>', methods=["POST"])
-def add_to_playlist(song_id):
-    playlist_id = request.form["playlist_id"]
-
-    conn = get_db()
-    conn.execute(
-        "INSERT INTO playlist_songs(playlist_id, song_id) VALUES (?,?)",
-        (playlist_id, song_id)
-    )
-    conn.commit()
-    conn.close()
-
-    return redirect('/')
-
-# ================= VIEW PLAYLIST =================
-@app.route('/playlist/<int:id>')
-def view_playlist(id):
+# ================= LIKED PAGE =================
+@app.route('/liked')
+def liked():
     conn = get_db()
 
     songs = conn.execute("""
     SELECT songs.* FROM songs
-    JOIN playlist_songs ON songs.id = playlist_songs.song_id
-    WHERE playlist_songs.playlist_id = ?
-    """, (id,)).fetchall()
+    JOIN likes ON songs.id = likes.song_id
+    """).fetchall()
 
     conn.close()
 
-    return render_template("index.html", songs=songs, playlists=get_playlists())
-
-# ================= 🎯 MOOD SYSTEM =================
-@app.route('/mood')
-def mood():
-    mood = request.args.get("type", "")
-
-    conn = get_db()
-
-    songs = conn.execute("""
-    SELECT songs.* FROM songs
-    JOIN moods ON songs.id = moods.song_id
-    WHERE moods.mood = ?
-    """, (mood,)).fetchall()
-
-    conn.close()
-
-    return render_template("index.html", songs=songs, playlists=get_playlists())
+    return render_template("index.html",
+                           songs=songs,
+                           playlists=get_playlists(),
+                           liked_ids=[s["id"] for s in songs])
 
 # ================= RUN =================
 if __name__ == "__main__":

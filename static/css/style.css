@@ -3,7 +3,7 @@
 body {
     background: #000;
     color: white;
-    font-family: Arial, sans-serif;
+    font-family: Arial;
     margin: 0;
 }
 
@@ -11,7 +11,6 @@ body {
 .navbar {
     display: flex;
     justify-content: space-between;
-    align-items: center;
     padding: 15px 40px;
     background: #111;
 }
@@ -23,8 +22,8 @@ body {
 /* NAV RIGHT */
 .nav-right {
     display: flex;
-    align-items: center;
     gap: 15px;
+    align-items: center;
 }
 
 /* LINKS */
@@ -33,20 +32,40 @@ a {
     text-decoration: none;
 }
 
-/* SEARCH */
-.search-box input {
-    padding: 8px 12px;
+/* INPUT */
+input {
+    padding: 8px;
     border-radius: 20px;
     border: none;
 }
 
-.search-box button {
-    padding: 8px 15px;
+/* BUTTON */
+button {
+    padding: 8px 12px;
     border-radius: 20px;
+    border: none;
     background: #1db954;
     color: white;
-    border: none;
     cursor: pointer;
+}
+
+/* MOOD */
+.mood-section {
+    text-align: center;
+    padding: 20px;
+}
+
+.mood-section a {
+    margin: 5px;
+    padding: 10px;
+    background: #1db954;
+    border-radius: 20px;
+    color: white;
+}
+
+/* PLAYLIST */
+.playlist-section {
+    padding: 20px;
 }
 
 /* SONG GRID */
@@ -55,17 +74,17 @@ a {
     flex-wrap: wrap;
     justify-content: center;
     gap: 30px;
-    padding: 40px;
+    padding: 30px;
 }
 
 /* CARD */
 .card {
     background: #111;
     padding: 15px;
-    border-radius: 12px;
+    border-radius: 10px;
     width: 220px;
-    transition: 0.3s;
     text-align: center;
+    transition: 0.3s;
 }
 
 .card:hover {
@@ -78,30 +97,7 @@ a {
     width: 100%;
     height: 150px;
     object-fit: cover;
-    border-radius: 10px;
     background: #222;
-}
-
-/* SONG TITLE */
-.card h3 {
-    margin: 10px 0;
-}
-
-/* PLAY BUTTON */
-.play-btn {
-    background: #1db954;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 20px;
-    color: white;
-    cursor: pointer;
-    margin-top: 10px;
-}
-
-/* LIKE LINK */
-.card a {
-    display: block;
-    margin-top: 10px;
 }
 
 /* PLAYER */
@@ -110,107 +106,10 @@ a {
     bottom: 0;
     width: 100%;
     background: #181818;
-    padding: 15px;
+    padding: 10px;
     text-align: center;
-    border-top: 1px solid #333;
 }
 
-/* PLAYER TEXT */
-#nowPlaying {
-    margin-bottom: 5px;
-    font-weight: bold;
-}
-
-/* PLAYER BUTTONS */
-.player button {
-    margin: 5px;
-    padding: 8px 12px;
-    border-radius: 10px;
-    border: none;
-    background: #1db954;
-    color: white;
-    cursor: pointer;
-}
-
-/* AUDIO */
 #audioPlayer {
     width: 80%;
-    margin-top: 10px;
-}
-
-/* RESPONSIVE */
-@media (max-width: 600px) {
-    .songs-container {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .navbar {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .nav-right {
-        flex-direction: column;
-    }
-}
-
-
-/* FEATURES SECTION */
-.features {
-    padding: 40px;
-    color: white;
-}
-
-.features h2 {
-    margin-bottom: 20px;
-    text-align: center;
-}
-
-/* TABLE */
-.features table {
-    width: 100%;
-    border-collapse: collapse;
-    background: #111;
-    border-radius: 10px;
-    overflow: hidden;
-}
-
-/* HEADER */
-.features th {
-    background: #1db954;
-    padding: 12px;
-    text-align: left;
-}
-
-/* ROW */
-.features td {
-    padding: 12px;
-    border-bottom: 1px solid #333;
-}
-
-/* HOVER EFFECT */
-.features tr:hover {
-    background: #222;
-}
-
-/* MOBILE */
-@media (max-width: 600px) {
-    .features table {
-        font-size: 12px;
-    }
-}
-
-.mood-section {
-    text-align: center;
-    padding: 20px;
-}
-
-.mood-section a {
-    margin: 5px;
-    padding: 10px 15px;
-    background: #1db954;
-    color: white;
-    border-radius: 20px;
-    text-decoration: none;
 }
