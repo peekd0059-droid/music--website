@@ -1,28 +1,36 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Upload Songs</title>
+    <title>Melofy</title>
+
+    <!-- ⚠️ CACHE FIX -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v=2) }}">
 </head>
+
 <body>
 
-<h2>🎵 Upload Multiple Songs</h2>
+<div class="navbar">
+    <h1>🎧 Melofy</h1>
+    <a href="/upload">Upload</a>
+</div>
 
-<!-- 🔙 BACK BUTTON -->
-<a href="/">⬅ Back to Home</a>
+<div class="songs-container">
 
-<br><br>
+{% for song in songs %}
+<div class="card">
 
-<form action="/upload" method="POST" enctype="multipart/form-data">
+    <img src="/{{song['image']}}" class="cover">
 
-    <label>Common Image:</label><br>
-    <input type="file" name="image"><br><br>
+    <h3>{{song['name']}}</h3>
 
-    <label>Select Songs:</label><br>
-    <input type="file" name="songs" multiple required><br><br>
+    <audio controls>
+        <source src="/{{song['file']}}">
+    </audio>
 
-    <button>Upload All</button>
+</div>
+{% endfor %}
 
-</form>
+</div>
 
 </body>
 </html>

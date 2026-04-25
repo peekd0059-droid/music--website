@@ -1,29 +1,31 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Upload Songs</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Upload</title>
+
+    <!-- ⚠️ CACHE FIX -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v=2) }}">
 </head>
 
 <body>
 
 <div class="upload-container">
 
-    <h2>🎵 Upload Songs</h2>
+<h2>Upload Songs</h2>
 
-    <a href="/" class="back-btn">⬅ Back to Home</a>
+<a href="/">⬅ Back</a>
 
-    <form action="/upload" method="POST" enctype="multipart/form-data">
+<form action="/upload" method="POST" enctype="multipart/form-data">
 
-        <label>Common Image</label>
-        <input type="file" name="image">
+    <label>Image</label>
+    <input type="file" name="image">
 
-        <label>Select Songs</label>
-        <input type="file" name="songs" multiple required>
+    <label>Songs</label>
+    <input type="file" name="songs" multiple>
 
-        <button type="submit">Upload All</button>
+    <button>Upload</button>
 
-    </form>
+</form>
 
 </div>
 
