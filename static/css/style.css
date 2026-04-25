@@ -1,10 +1,10 @@
-
 /* BODY */
 body {
     background: #000;
     color: white;
     font-family: Arial;
     margin: 0;
+    min-height: 100vh;
 }
 
 /* NAVBAR */
@@ -19,11 +19,15 @@ body {
     color: #1db954;
 }
 
-/* GRID */
+.navbar a {
+    color: #1db954;
+    font-weight: bold;
+}
+
+/* GRID (SAFE CHANGE) */
 .songs-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 25px;
     padding: 30px;
 }
@@ -33,7 +37,6 @@ body {
     background: #111;
     padding: 15px;
     border-radius: 10px;
-    width: 220px;
     text-align: center;
     transition: 0.3s;
 }

@@ -4,7 +4,7 @@
     <title>Melofy</title>
 
     <!-- CACHE FIX -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v=3) }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v=4) }}">
 </head>
 
 <body>
@@ -21,12 +21,10 @@
 {% for song in songs %}
 <div class="card">
 
-    <!-- IMAGE FIX -->
-    <img src="{{ url_for('static', filename=song['image'].replace('static/', '')) }}" class="cover">
+    <img src="{{ url_for('static', filename=song['image']) }}" class="cover">
 
     <h3>{{song['name']}}</h3>
 
-    <!-- PLAY BUTTON -->
     <button onclick="playSong({{loop.index0}})">▶ Play</button>
 
 </div>
@@ -34,13 +32,13 @@
 
 </div>
 
-<!-- SINGLE PLAYER -->
+<!-- PLAYER -->
 <div class="player">
     <p id="nowPlaying">No song</p>
     <audio id="audioPlayer" controls></audio>
 </div>
 
-<!-- JS PLAYER -->
+<!-- JS -->
 <script>
 let songs = [
 {% for song in songs %}
@@ -55,7 +53,7 @@ function playSong(index){
     let player = document.getElementById("audioPlayer");
     let title = document.getElementById("nowPlaying");
 
-    player.src = "/" + songs[index].file;
+    player.src = "/static/" + songs[index].file;
     player.play();
 
     title.innerText = songs[index].name;
