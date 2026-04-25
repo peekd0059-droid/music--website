@@ -3,24 +3,22 @@
 <head>
     <title>Melofy</title>
 
-    <!-- CACHE FIX -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v=4) }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v=5) }}">
 </head>
 
 <body>
 
-<!-- NAVBAR -->
 <div class="navbar">
     <h1>🎧 Melofy</h1>
     <a href="/upload">Upload</a>
 </div>
 
-<!-- SONG GRID -->
 <div class="songs-container">
 
 {% for song in songs %}
 <div class="card">
 
+    <!-- IMAGE FIX -->
     <img src="{{ url_for('static', filename=song['image']) }}" class="cover">
 
     <h3>{{song['name']}}</h3>
@@ -38,7 +36,6 @@
     <audio id="audioPlayer" controls></audio>
 </div>
 
-<!-- JS -->
 <script>
 let songs = [
 {% for song in songs %}
@@ -53,6 +50,7 @@ function playSong(index){
     let player = document.getElementById("audioPlayer");
     let title = document.getElementById("nowPlaying");
 
+    // IMPORTANT FIX
     player.src = "/static/" + songs[index].file;
     player.play();
 

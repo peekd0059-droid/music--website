@@ -46,19 +46,23 @@ def upload():
         os.makedirs("static/images", exist_ok=True)
 
         image_path = ""
+
+        # SAVE IMAGE
         if image and image.filename:
-            image_path = "static/images/" + image.filename
-            image.save(image_path)
+            image_path = "images/" + image.filename
+            image.save(os.path.join("static", image_path))
 
         conn = get_db()
 
+        # SAVE SONGS
         for s in songs:
             if s.filename == "":
                 continue
 
             filename = s.filename.replace(" ", "_")
-            song_path = "static/songs/" + filename
-            s.save(song_path)
+
+            song_path = "songs/" + filename
+            s.save(os.path.join("static", song_path))
 
             name = filename.split(".")[0]
 
