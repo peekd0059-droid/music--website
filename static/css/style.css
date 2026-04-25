@@ -12,7 +12,7 @@ body{
     font-family:Arial, sans-serif;
 }
 
-/* ===== APP LAYOUT ===== */
+/* ===== APP ===== */
 .app{
     display:flex;
 }
@@ -51,13 +51,13 @@ body{
 /* ===== TOPBAR ===== */
 .topbar{
     padding:20px;
-    background:#000;
 }
 
 /* ===== GRID ===== */
 .songs-container{
     display:grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px,1fr));
+    grid-template-columns: repeat(auto-fit, minmax(200px, 250px));
+    justify-content:center;
     gap:25px;
     padding:20px;
 }
@@ -69,6 +69,8 @@ body{
     border-radius:12px;
     text-align:center;
     transition:0.3s;
+    width:100%;
+    max-width:250px;
 }
 
 .card:hover{
@@ -76,12 +78,17 @@ body{
     background:#1a1a1a;
 }
 
-/* ===== IMAGE ===== */
+/* ===== IMAGE (FIXED) ===== */
 .cover{
     width:100%;
-    height:180px;
+    height:150px;   /* 🔥 FIXED HEIGHT */
     object-fit:cover;
     border-radius:10px;
+    margin-bottom:10px;
+}
+
+/* ===== TEXT ===== */
+.card h3{
     margin-bottom:10px;
 }
 
@@ -109,9 +116,7 @@ audio{
     width:95%;
 }
 
-/* ========================= */
-/* 📱 MOBILE */
-/* ========================= */
+/* ===== MOBILE ===== */
 @media(max-width:768px){
 
     .sidebar{
@@ -127,6 +132,6 @@ audio{
     }
 
     .cover{
-        height:200px;
+        height:180px;
     }
 }
