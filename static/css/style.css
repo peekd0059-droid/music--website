@@ -135,3 +135,9 @@ audio{
         height:180px;
     }
 }
+
+.like-btn{
+    color:#1db954;
+    text-decoration:none;
+    font-weight:bold;
+}

@@ -5,7 +5,7 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v=20) }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v=30) }}">
 </head>
 
 <body>
@@ -41,6 +41,13 @@
             <h3>{{song['name']}}</h3>
 
             <button onclick="playSong({{loop.index0}})">▶ Play</button>
+
+            <br><br>
+
+            <!-- ❤️ LIKE -->
+            <a href="/like/{{song['id']}}" class="like-btn">
+                ❤️ {{song['likes']}}
+            </a>
 
         </div>
         {% endfor %}

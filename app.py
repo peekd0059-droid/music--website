@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect
 import sqlite3, os
 
 app = Flask(__name__)
@@ -9,11 +9,12 @@ def get_db():
     conn.row_factory = sqlite3.Row
     return conn
 
-# ===== INIT =====
+# ===== INIT DB =====
 def init_db():
     conn = get_db()
     c = conn.cursor()
 
+    # songs table
     c.execute("""
     CREATE TABLE IF NOT EXISTS songs (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -23,15 +24,22 @@ def init_db():
     )
     """)
 
+    # likes table
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS likes (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        song_id INTEGER
+    )
+    """)
+
     conn.commit()
     conn.close()
 
 init_db()
 
-# ===== ADMIN FLAG (future login ready) =====
+# ===== ADMIN FLAG =====
 @app.context_processor
 def inject_admin():
-    # 🔥 अभी True = तुम admin हो
     return dict(is_admin=True)
 
 # ===== HOME =====
@@ -39,15 +47,30 @@ def inject_admin():
 def home():
     conn = get_db()
     songs = conn.execute("SELECT * FROM songs").fetchall()
-    conn.close()
-    return render_template("index.html", songs=songs)
 
-# ===== UPLOAD (PROTECTED) =====
+    song_data = []
+    for s in songs:
+        count = conn.execute(
+            "SELECT COUNT(*) FROM likes WHERE song_id=?",
+            (s["id"],)
+        ).fetchone()[0]
+
+        song_data.append({
+            "id": s["id"],
+            "name": s["name"],
+            "file": s["file"],
+            "image": s["image"],
+            "likes": count
+        })
+
+    conn.close()
+    return render_template("index.html", songs=song_data)
+
+# ===== UPLOAD =====
 @app.route('/upload', methods=["GET","POST"])
 def upload():
 
-    is_admin = True  # 🔥 बाद में login से आएगा
-
+    is_admin = True
     if not is_admin:
         return "Access Denied"
 
@@ -61,14 +84,12 @@ def upload():
 
         image_path = ""
 
-        # SAVE IMAGE
         if image and image.filename:
             image_path = "images/" + image.filename
             image.save(os.path.join("static", image_path))
 
         conn = get_db()
 
-        # SAVE SONGS
         for s in songs:
             if s.filename == "":
                 continue
@@ -91,6 +112,26 @@ def upload():
         return redirect('/')
 
     return render_template("upload.html")
+
+# ===== LIKE =====
+@app.route('/like/<int:id>')
+def like(id):
+    conn = get_db()
+
+    existing = conn.execute(
+        "SELECT * FROM likes WHERE song_id=?",
+        (id,)
+    ).fetchone()
+
+    if existing:
+        conn.execute("DELETE FROM likes WHERE song_id=?", (id,))
+    else:
+        conn.execute("INSERT INTO likes(song_id) VALUES (?)", (id,))
+
+    conn.commit()
+    conn.close()
+
+    return redirect('/')
 
 # ===== RUN =====
 if __name__ == "__main__":
