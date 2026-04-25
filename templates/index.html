@@ -2,38 +2,51 @@
 <html>
 <head>
     <title>Melofy</title>
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v=6) }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v=10) }}">
 </head>
 
 <body>
 
-<!-- NAVBAR -->
-<div class="navbar">
-    <h1>🎧 Melofy</h1>
+<div class="app">
 
-    <!-- 🔥 Upload hidden for users -->
-    {% if is_admin %}
-    <a href="/upload">Upload</a>
-    {% endif %}
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <h2>🎧 Melofy</h2>
 
-</div>
+        <a href="/">🏠 Home</a>
 
-<!-- SONG GRID -->
-<div class="songs-container">
+        {% if is_admin %}
+        <a href="/upload">⬆ Upload</a>
+        {% endif %}
+    </div>
 
-{% for song in songs %}
-<div class="card">
+    <!-- MAIN CONTENT -->
+    <div class="main">
 
-    <img src="{{ url_for('static', filename=song['image']) }}" class="cover">
+        <!-- TOP BAR (mobile + desktop) -->
+        <div class="topbar">
+            <h3>Discover Music</h3>
+        </div>
 
-    <h3>{{song['name']}}</h3>
+        <!-- SONG GRID -->
+        <div class="songs-container">
+            {% for song in songs %}
+            <div class="card">
 
-    <button onclick="playSong({{loop.index0}})">▶ Play</button>
+                <img src="{{ url_for('static', filename=song['image']) }}" class="cover">
 
-</div>
-{% endfor %}
+                <h3>{{song['name']}}</h3>
+
+                <button onclick="playSong({{loop.index0}})">▶ Play</button>
+
+            </div>
+            {% endfor %}
+        </div>
+
+    </div>
 
 </div>
 
