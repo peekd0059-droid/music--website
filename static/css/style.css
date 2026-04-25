@@ -141,3 +141,31 @@ audio{
     text-decoration:none;
     font-weight:bold;
 }
+
+/* ===== SEARCH BAR ===== */
+.topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:20px;
+}
+
+#searchInput{
+    padding:8px 15px;
+    border-radius:20px;
+    border:none;
+    outline:none;
+    width:220px;
+}
+
+/* mobile */
+@media(max-width:768px){
+    .topbar{
+        flex-direction:column;
+        gap:10px;
+    }
+
+    #searchInput{
+        width:100%;
+    }
+}

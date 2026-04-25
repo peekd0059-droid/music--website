@@ -2,10 +2,8 @@
 <html>
 <head>
     <title>Melofy</title>
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v=30) }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v=40) }}">
 </head>
 
 <body>
@@ -15,7 +13,6 @@
     <!-- SIDEBAR -->
     <div class="sidebar">
         <h2>🎧 Melofy</h2>
-
         <a href="/">🏠 Home</a>
 
         {% if is_admin %}
@@ -26,15 +23,24 @@
     <!-- MAIN -->
     <div class="main">
 
+        <!-- TOPBAR -->
         <div class="topbar">
             <h3>Discover Music</h3>
+
+            <!-- 🔍 SEARCH BAR -->
+            <input 
+                type="text" 
+                id="searchInput" 
+                placeholder="Search songs..." 
+                onkeyup="searchSongs()"
+            >
         </div>
 
         <!-- SONG GRID -->
-        <div class="songs-container">
+        <div class="songs-container" id="songsContainer">
 
         {% for song in songs %}
-        <div class="card">
+        <div class="card" data-name="{{song['name']}}">
 
             <img src="{{ url_for('static', filename=song['image']) }}" class="cover">
 
@@ -44,7 +50,6 @@
 
             <br><br>
 
-            <!-- ❤️ LIKE -->
             <a href="/like/{{song['id']}}" class="like-btn">
                 ❤️ {{song['likes']}}
             </a>
@@ -65,6 +70,7 @@
 </div>
 
 <script>
+// ===== SONG DATA =====
 let songs = [
 {% for song in songs %}
 {
@@ -74,6 +80,7 @@ let songs = [
 {% endfor %}
 ];
 
+// ===== PLAY =====
 function playSong(index){
     let player = document.getElementById("audioPlayer");
     let title = document.getElementById("nowPlaying");
@@ -82,6 +89,22 @@ function playSong(index){
     player.play();
 
     title.innerText = songs[index].name;
+}
+
+// ===== SEARCH =====
+function searchSongs(){
+    let input = document.getElementById("searchInput").value.toLowerCase();
+    let cards = document.querySelectorAll(".card");
+
+    cards.forEach(card => {
+        let name = card.getAttribute("data-name").toLowerCase();
+
+        if(name.includes(input)){
+            card.style.display = "block";
+        } else {
+            card.style.display = "none";
+        }
+    });
 }
 </script>
 
