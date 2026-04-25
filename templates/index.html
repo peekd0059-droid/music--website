@@ -3,34 +3,64 @@
 <head>
     <title>Melofy</title>
 
-    <!-- ⚠️ CACHE FIX -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v=2) }}">
+    <!-- CACHE FIX -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v=3) }}">
 </head>
 
 <body>
 
+<!-- NAVBAR -->
 <div class="navbar">
     <h1>🎧 Melofy</h1>
     <a href="/upload">Upload</a>
 </div>
 
+<!-- SONG GRID -->
 <div class="songs-container">
 
 {% for song in songs %}
 <div class="card">
 
-    <img src="/{{song['image']}}" class="cover">
+    <!-- IMAGE FIX -->
+    <img src="{{ url_for('static', filename=song['image'].replace('static/', '')) }}" class="cover">
 
     <h3>{{song['name']}}</h3>
 
-    <audio controls>
-        <source src="/{{song['file']}}">
-    </audio>
+    <!-- PLAY BUTTON -->
+    <button onclick="playSong({{loop.index0}})">▶ Play</button>
 
 </div>
 {% endfor %}
 
 </div>
+
+<!-- SINGLE PLAYER -->
+<div class="player">
+    <p id="nowPlaying">No song</p>
+    <audio id="audioPlayer" controls></audio>
+</div>
+
+<!-- JS PLAYER -->
+<script>
+let songs = [
+{% for song in songs %}
+{
+    file: "{{song['file']}}",
+    name: "{{song['name']}}"
+},
+{% endfor %}
+];
+
+function playSong(index){
+    let player = document.getElementById("audioPlayer");
+    let title = document.getElementById("nowPlaying");
+
+    player.src = "/" + songs[index].file;
+    player.play();
+
+    title.innerText = songs[index].name;
+}
+</script>
 
 </body>
 </html>
