@@ -1,7 +1,16 @@
 from flask import Flask, render_template, request, redirect
-import sqlite3, os
+import sqlite3
+import cloudinary
+import cloudinary.uploader
 
 app = Flask(__name__)
+
+# ===== CLOUDINARY CONFIG =====
+cloudinary.config(
+    cloud_name="dyyhnehhj",
+    api_key="241782544424174",
+    api_secret="kAwAs7J5k8aKx85jaO5N19MRc8E"
+)
 
 # ===== DB =====
 def get_db():
@@ -14,7 +23,6 @@ def init_db():
     conn = get_db()
     c = conn.cursor()
 
-    # songs table
     c.execute("""
     CREATE TABLE IF NOT EXISTS songs (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -24,7 +32,6 @@ def init_db():
     )
     """)
 
-    # likes table
     c.execute("""
     CREATE TABLE IF NOT EXISTS likes (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -37,7 +44,7 @@ def init_db():
 
 init_db()
 
-# ===== ADMIN FLAG =====
+# ===== ADMIN =====
 @app.context_processor
 def inject_admin():
     return dict(is_admin=True)
@@ -48,14 +55,14 @@ def home():
     conn = get_db()
     songs = conn.execute("SELECT * FROM songs").fetchall()
 
-    song_data = []
+    data = []
     for s in songs:
         count = conn.execute(
             "SELECT COUNT(*) FROM likes WHERE song_id=?",
             (s["id"],)
         ).fetchone()[0]
 
-        song_data.append({
+        data.append({
             "id": s["id"],
             "name": s["name"],
             "file": s["file"],
@@ -64,46 +71,43 @@ def home():
         })
 
     conn.close()
-    return render_template("index.html", songs=song_data)
+    return render_template("index.html", songs=data)
 
-# ===== UPLOAD =====
+# ===== UPLOAD (CLOUD) =====
 @app.route('/upload', methods=["GET","POST"])
 def upload():
-
-    is_admin = True
-    if not is_admin:
-        return "Access Denied"
 
     if request.method == "POST":
 
         image = request.files.get("image")
         songs = request.files.getlist("songs")
 
-        os.makedirs("static/songs", exist_ok=True)
-        os.makedirs("static/images", exist_ok=True)
+        image_url = ""
 
-        image_path = ""
-
-        if image and image.filename:
-            image_path = "images/" + image.filename
-            image.save(os.path.join("static", image_path))
+        # ===== IMAGE UPLOAD =====
+        if image:
+            result = cloudinary.uploader.upload(image)
+            image_url = result["secure_url"]
 
         conn = get_db()
 
+        # ===== SONG UPLOAD =====
         for s in songs:
             if s.filename == "":
                 continue
 
-            filename = s.filename.replace(" ", "_")
+            result = cloudinary.uploader.upload(
+                s,
+                resource_type="video"  # 🔥 important for mp3
+            )
 
-            song_path = "songs/" + filename
-            s.save(os.path.join("static", song_path))
+            song_url = result["secure_url"]
 
-            name = filename.split(".")[0]
+            name = s.filename.split(".")[0]
 
             conn.execute(
                 "INSERT INTO songs(name,file,image) VALUES (?,?,?)",
-                (name, song_path, image_path)
+                (name, song_url, image_url)
             )
 
         conn.commit()

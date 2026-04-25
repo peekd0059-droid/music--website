@@ -2,8 +2,10 @@
 <html>
 <head>
     <title>Melofy</title>
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v=40) }}">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v=50) }}">
 </head>
 
 <body>
@@ -13,6 +15,7 @@
     <!-- SIDEBAR -->
     <div class="sidebar">
         <h2>🎧 Melofy</h2>
+
         <a href="/">🏠 Home</a>
 
         {% if is_admin %}
@@ -27,7 +30,7 @@
         <div class="topbar">
             <h3>Discover Music</h3>
 
-            <!-- 🔍 SEARCH BAR -->
+            <!-- 🔍 SEARCH -->
             <input 
                 type="text" 
                 id="searchInput" 
@@ -42,7 +45,8 @@
         {% for song in songs %}
         <div class="card" data-name="{{song['name']}}">
 
-            <img src="{{ url_for('static', filename=song['image']) }}" class="cover">
+            <!-- 🔥 IMAGE (CLOUD URL DIRECT) -->
+            <img src="{{song['image']}}" class="cover">
 
             <h3>{{song['name']}}</h3>
 
@@ -50,6 +54,7 @@
 
             <br><br>
 
+            <!-- ❤️ LIKE -->
             <a href="/like/{{song['id']}}" class="like-btn">
                 ❤️ {{song['likes']}}
             </a>
@@ -85,7 +90,8 @@ function playSong(index){
     let player = document.getElementById("audioPlayer");
     let title = document.getElementById("nowPlaying");
 
-    player.src = "/static/" + songs[index].file;
+    // 🔥 CLOUD URL DIRECT
+    player.src = songs[index].file;
     player.play();
 
     title.innerText = songs[index].name;
